@@ -6,6 +6,9 @@ from sage.misc.cachefunc import cached_method
 
 from collections import Counter
 
+import PIL
+from PIL import Image
+
 import numpy as np
 
 print(version())
@@ -73,8 +76,15 @@ def render_bitmap(bitmap: np.array):
     if len(bitmap.shape) != 2:
         raise ValueError('bitmap must be 2d array')
 
-    from PIL import Image
-    img = Image.fromarray(bitmap == 0)
+    img = Image.fromarray(bitmap)
+    img.show()
+    return img
+
+def render_bitmap_log(bitmap: np.array, factor: float):
+    p = bitmap / np.max(bitmap)
+    imgbuf = np.zeros_like(bitmap, dtype=np.int32)
+    imgbuf[p > 0] = 255 + factor * np.log2(p[p > 0])
+    img = Image.fromarray(imgbuf, mode="L")
     img.show()
     return img
 

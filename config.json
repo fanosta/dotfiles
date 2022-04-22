@@ -1,0 +1,10 @@
+[
+    {
+        "repo": "ipython/profile_sage",
+        "host": "~/.ipython/profile_sage"
+    },
+    {
+        "repo": "zshrc",
+        "host": "~/.zshrc"
+    }
+]
