@@ -6,5 +6,17 @@
     {
         "repo": "zshrc",
         "host": "~/.zshrc"
+    },
+    {
+        "repo": "tmux.conf",
+        "host": "~/.tmux.conf"
+    },
+    {
+        "repo": "init.vim",
+        "host": "~/.config/nvim/init.vim"
+    },
+    {
+        "repo": "i3/config",
+        "host": "~/.config/i3/config"
     }
 ]
