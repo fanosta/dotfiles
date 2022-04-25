@@ -29,7 +29,7 @@
 #c.InteractiveShellApp.exec_files = []
 
 ## lines of code to run at IPython startup.
-#c.InteractiveShellApp.exec_lines = []
+#c.InteractiveShellApp.exec_lines = ["from sage.all import *", "print(version())"]
 
 ## A list of dotted module names of IPython extensions to load.
 #c.InteractiveShellApp.extensions = []
@@ -40,8 +40,9 @@
 ## A file to be run
 #c.InteractiveShellApp.file_to_run = ''
 
-## Enable GUI event loop integration with any of ('glut', 'gtk', 'gtk2', 'gtk3',
-#  'osx', 'pyglet', 'qt', 'qt4', 'qt5', 'tk', 'wx', 'gtk2', 'qt4').
+## Enable GUI event loop integration with any of ('asyncio', 'glut', 'gtk',
+#  'gtk2', 'gtk3', 'osx', 'pyglet', 'qt', 'qt4', 'qt5', 'tk', 'wx', 'gtk2',
+#  'qt4').
 #c.InteractiveShellApp.gui = None
 
 ## Should variables loaded at startup (by startup files, exec_lines, etc.) be
@@ -150,22 +151,25 @@ c.TerminalIPythonApp.force_interact = True
 #  user input before code is run.
 #c.InteractiveShell.ast_transformers = []
 
+## Automatically run await statement in the top level repl.
+#c.InteractiveShell.autoawait = True
+
 ## Make IPython automatically call any callable object even if you didn't type
 #  explicit parentheses. For example, 'str 43' becomes 'str(43)' automatically.
 #  The value can be '0' to disable the feature, '1' for 'smart' autocall, where
 #  it is not applied if there are no more arguments on the line, and '2' for
 #  'full' autocall, where all callable objects are automatically called (even if
 #  no arguments are present).
-#c.InteractiveShell.autocall = 1
+#c.InteractiveShell.autocall = 0
 
 ## Autoindent IPython code entered interactively.
-c.InteractiveShell.autoindent = True
+#c.InteractiveShell.autoindent = True
 
 ## Enable magic commands to be called without the leading %.
 #c.InteractiveShell.automagic = True
 
 ## The part of the banner to be printed before the profile
-#c.InteractiveShell.banner1 = "Python 3.7.1 (default, Oct 22 2018, 10:41:28) \nType 'copyright', 'credits' or 'license' for more information\nIPython 6.5.0 -- An enhanced Interactive Python. Type '?' for help.\n"
+#c.InteractiveShell.banner1 = "Python 3.8.0 (default, Oct 23 2019, 18:51:26) \nType 'copyright', 'credits' or 'license' for more information\nIPython 7.10.1 -- An enhanced Interactive Python. Type '?' for help.\n"
 
 ## The part of the banner to be printed after the profile
 #c.InteractiveShell.banner2 = ''
@@ -220,6 +224,10 @@ c.InteractiveShell.autoindent = True
 #  specify a log file to **append** logs to.
 #c.InteractiveShell.logstart = False
 
+## Select the loop runner that will be used to execute top-level asynchronous
+#  code
+#c.InteractiveShell.loop_runner = 'IPython.core.interactiveshell._asyncio_runner'
+
 ## 
 #c.InteractiveShell.object_info_string_level = 0
 
@@ -255,7 +263,7 @@ c.InteractiveShell.autoindent = True
 #c.InteractiveShell.separate_out2 = ''
 
 ## Show rewritten input, e.g. for autocall.
-c.InteractiveShell.show_rewritten_input = True
+#c.InteractiveShell.show_rewritten_input = True
 
 ## Enables rich html representation of docstrings. (This requires the docrepr
 #  module).
@@ -271,6 +279,9 @@ c.InteractiveShell.show_rewritten_input = True
 # TerminalInteractiveShell(InteractiveShell) configuration
 #------------------------------------------------------------------------------
 
+## Autoformatter to reformat Terminal code. Can be `'black'` or `None`
+#c.TerminalInteractiveShell.autoformatter = None
+
 ## Set to confirm when you try to exit IPython with an EOF (Control-D in Unix,
 #  Control-Z/Enter in Windows). By typing 'exit' or 'quit', you can force a
 #  direct exit without any confirmation.
@@ -285,7 +296,7 @@ c.TerminalInteractiveShell.confirm_exit = False
 #c.TerminalInteractiveShell.editing_mode = 'emacs'
 
 ## Set the editor used by IPython (default to $EDITOR/vi/notepad).
-#c.TerminalInteractiveShell.editor = 'vim'
+#c.TerminalInteractiveShell.editor = '/usr/bin/nvim'
 
 ## Allows to enable/disable the prompt toolkit history search
 #c.TerminalInteractiveShell.enable_history_search = True
@@ -309,9 +320,15 @@ c.TerminalInteractiveShell.extra_open_editor_shortcuts = True
 ## Override highlighting format for specific tokens
 #c.TerminalInteractiveShell.highlighting_style_overrides = {}
 
+## 
+#c.TerminalInteractiveShell.mime_renderers = {}
+
 ## Enable mouse support in the prompt (Note: prevents selecting text with the
 #  mouse)
 #c.TerminalInteractiveShell.mouse_support = False
+
+## Display the current vi mode (when using vi editing mode).
+#c.TerminalInteractiveShell.prompt_includes_vi_mode = True
 
 ## Class used to generate Prompt token for prompt_toolkit
 #c.TerminalInteractiveShell.prompts_class = 'IPython.terminal.prompts.Prompts'
@@ -517,8 +534,9 @@ c.TerminalInteractiveShell.extra_open_editor_shortcuts = True
 #  hurt performance by preventing jedi to build its cache.
 #c.Completer.jedi_compute_type_timeout = 400
 
-## Experimental: Use Jedi to generate autocompletions. Off by default.
-#c.Completer.use_jedi = False
+## Experimental: Use Jedi to generate autocompletions. Default to True if jedi is
+#  installed.
+#c.Completer.use_jedi = True
 
 #------------------------------------------------------------------------------
 # IPCompleter(Completer) configuration

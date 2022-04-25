@@ -11,6 +11,8 @@ from PIL import Image
 
 import numpy as np
 
+from math import log2
+
 print(version())
 
 
