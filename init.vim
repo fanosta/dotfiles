@@ -87,15 +87,15 @@ call plug#end()
 
 "lightline
 let g:lightline={'colorscheme': 'solarized'}
-let g:lightline = {
-      \ 'colorscheme': 'solarized',
-      \ 'active': {
-      \   'right': [ [ 'lineinfo' ], [ 'percent', 'wordcount' ], [ 'fileformat', 'fileencoding', 'filetype' ] ]
-      \ },
-      \ 'component_function': {
-      \   'wordcount': 'WordCount',
-      \ },
-      \ }
+"let g:lightline = {
+"      \ 'colorscheme': 'solarized',
+"      \ 'active': {
+"      \   'right': [ [ 'lineinfo' ], [ 'percent', 'wordcount' ], [ 'fileformat', 'fileencoding', 'filetype' ] ]
+"      \ },
+"      \ 'component_function': {
+"      \   'wordcount': 'WordCount',
+"      \ },
+"      \ }
 
 
 set laststatus=2
