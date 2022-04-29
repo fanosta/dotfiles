@@ -37,7 +37,7 @@ if [[ "$TERM" != "linux" && "$TERM" != "vt220" ]]; then
     source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
   fi
 
-  source /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme
+  #source /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme
   #POWERLEVEL10K_MODE='compatible'
   #ZSH_THEME="powerlevel10k/powerlevel10k"
   #ZSH_THEME="agnoster"
