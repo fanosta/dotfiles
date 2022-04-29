@@ -103,7 +103,7 @@ set noshowmode
 
 syntax enable
 set background=dark
-"set termguicolors
+set termguicolors
 let g:neosolarized_contrast = "high"
 let g:neosolarized_visibility = "high"
 colorscheme NeoSolarized
