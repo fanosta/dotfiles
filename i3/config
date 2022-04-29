@@ -322,6 +322,9 @@ bindsym XF86AudioPause exec --no-startup-id playerctl pause
 bindsym XF86AudioNext exec --no-startup-id playerctl next
 bindsym XF86AudioPrev exec --no-startup-id playerctl previous
 
+# screenshot
+bindsym Print exec clipshot
+
 ###############################################################################
 # autostart
 ###############################################################################
