@@ -36,33 +36,27 @@ set $ws_p "14:vbox"
 for_window [class="Polybar"] gaps inner 0
 for_window [class="Polybar"] gaps outer 0
 
-#for_window [class="^.*"] border pixel 1
-for_window [class="^TelegramDesktop$"] border pixel 1
-
-for_window [class="^Pdfpc$"] border pixel 0
-for_window [class="^obs$"] border pixel 0
-
-#for_window [class="VirtualBox Machine"] border pixel 0
-#for_window [class="VirtualBox Machine"] fullscreen
+for_window [class="^.*"] border pixel
+for_window [class="VirtualBox Machine"] border pixel 0
+for_window [class="VirtualBox Machine"] fullscreen
 for_window [window_role="pop-up"] floating enable
 for_window [class="Super Mario Bros"] floating enable
 for_window [class="^MATLAB" title="^Figure"] floating enable
 for_window [class="^Chromium$"] floating disable
 for_window [title="^Android Emulator"] floating enable
 for_window [class="^at-gv-egiz-bku-webstart-Launcher$"] floating enable
-for_window [class="^kruler$"] floating enable
 for_window [class="^XEyes$"] floating enable
-for_window [class="^egoMouseLook.py$"] border normal
-for_window [class="^egoMouseLook.py$"] floating enable
 # for_window [class="^konsole$"] split vertical
 
+# custom launcher
+for_window [title="^fuzzy"] floating enable
+
+
 # move windows
-for_window [class="^firefox$"] move container to workspace $ws1
 for_window [class="^VirtualBox Machine$"] move container to workspace $ws_p
-for_window [class="^Thunderbird$" window_role="2pane"] move container to workspace $ws9
-for_window [class="^Signal$" instance="^signal$" title="^Signal$"] move container to workspace $ws9
-for_window [class="^discord$" instance="^discord$" title="^Discord$"] move container to workspace $ws9
-for_window [class="^Spotify$" instance="^spotify$" title="^Spotify$"] move container to workspace $ws10
+for_window [class="^Thunderbird$"] move container to workspace $ws9
+for_window [class="^discord$"] move container to workspace $ws9
+for_window [class="^Spotify$"] move container to workspace $ws10
 
 default_border pixel 1
 #for_window [class="konsole"] border pixel 2
@@ -107,10 +101,12 @@ client.background $white
 # Use Mouse+$mod to drag floating windows to their wanted position
 floating_modifier $mod
 
+bindsym $mod+m move workspace to output left
+
 # start a terminal
-bindsym $mod+Return exec ~/.i3/terminal_here.sh
-# bindsym $mod+Return exec term
-# bindsym $mod+Return exec urxvt
+# bindsym $mod+Return exec ~/.i3/terminal_here.sh
+bindsym $mod+Return exec term
+#bindsym $mod+Return exec urxvt
 
 # layouts
 bindsym $mod+Shift+Return append_layout /home/marcel/.i3/quad_konsole.jsonc, exec $term, exec $term, exec $term, exec $term
@@ -120,8 +116,8 @@ bindsym $mod+Shift+Return append_layout /home/marcel/.i3/quad_konsole.jsonc, exe
 # bindsym $mod+n exec bash ~/.screenlayouts/portable.sh
 
 # locker
-bindsym $mod+Escape exec i3lock -n -c 258f41
-bindsym $mod+Shift+Escape exec systemctl suspend
+bindsym $mod+Escape exec lock
+bindsym $mod+Shift+Escape exec "betterlockscreen -l & sleep 1; systemctl suspend"
 
 # floating vim
 # bindsym $mod+q exec floating_vim
@@ -156,8 +152,6 @@ bindsym $mod+Shift+Left move left
 bindsym $mod+Shift+Down move down
 bindsym $mod+Shift+Up move up
 bindsym $mod+Shift+Right move right
-
-bindsym $mod+m move workspace to output left
 
 # split in horizontal orientation
 bindsym $mod+h split h
@@ -233,13 +227,6 @@ bindsym $mod+$alt+i rename workspace to $ws_i
 bindsym $mod+$alt+o rename workspace to $ws_o
 bindsym $mod+$alt+p rename workspace to $ws_p
 
-# assign workspaces to outputs
-workspace $ws9 output DP-2
-workspace $ws10 output DP-2
-workspace $ws_u output DP-2
-workspace $ws_i output DP-2
-workspace $ws_o output DP-2
-workspace $ws_p output DP-2
 
 # reload the configuration file
 bindsym $mod+Shift+c reload
@@ -298,32 +285,20 @@ bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume $sink -3
 bindsym Shift+XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume $sink -2dB && pkill -SIGRTMIN+10 i3blocks #decrease sound volume
 
 # mute mic
-# bindsym XF86AudioMute exec --no-startup-id pactl set-source-mute "$source" toggle
-# bindsym $mod+z exec --no-startup-id pactl set-source-mute "$source" toggle
+bindsym XF86AudioMute exec --no-startup-id pactl set-source-mute "$source" toggle
+bindsym $mod+z exec --no-startup-id pactl set-source-mute "$source" toggle
 
 # Sreen brightness controls
-# bindsym XF86MonBrightnessUp exec --no-startup-id light -A 10 # increase screen brightness
-# bindsym Shift+XF86MonBrightnessUp exec --no-startup-id light -A 1 # increase screen brightness
-# bindsym XF86MonBrightnessDown exec --no-startup-id light -U 10 # decrease screen brightness
-# bindsym Shift+XF86MonBrightnessDown exec --no-startup-id light -U 1 # decrease screen brightness
-#bindsym XF86MonBrightnessUp exec --no-startup-id brt + 10 # increase screen brightness
-#bindsym Shift+XF86MonBrightnessUp exec --no-startup-id brt + 1 # increase screen brightness
-#bindsym XF86MonBrightnessDown exec --no-startup-id brt - 10 # decrease screen brightness
-#bindsym Shift+XF86MonBrightnessDown exec --no-startup-id brt - 1 # decrease screen brightness
-
-bindsym XF86MonBrightnessUp exec --no-startup-id brt + 20 # increase screen brightness
-bindsym Shift+XF86MonBrightnessUp exec --no-startup-id brt + 5 # increase screen brightness
-bindsym XF86MonBrightnessDown exec --no-startup-id brt - 20 # decrease screen brightness
-bindsym Shift+XF86MonBrightnessDown exec --no-startup-id brt - 5 # decrease screen brightness
+bindsym XF86MonBrightnessUp exec --no-startup-id light -A 10 # increase screen brightness
+bindsym Shift+XF86MonBrightnessUp exec --no-startup-id light -A 1 # increase screen brightness
+bindsym XF86MonBrightnessDown exec --no-startup-id light -U 10 # decrease screen brightness
+bindsym Shift+XF86MonBrightnessDown exec --no-startup-id light -U 1 # decrease screen brightness
 
 # Media player controls
-bindsym XF86AudioPlay exec --no-startup-id playerctl play-pause
+bindsym XF86AudioPlay exec --no-startup-id playerctl play
 bindsym XF86AudioPause exec --no-startup-id playerctl pause
 bindsym XF86AudioNext exec --no-startup-id playerctl next
 bindsym XF86AudioPrev exec --no-startup-id playerctl previous
-
-# screenshot
-bindsym Print exec clipshot
 
 ###############################################################################
 # autostart
@@ -333,16 +308,8 @@ bindsym Print exec clipshot
 exec --no-startup-id i3-battery-popup -L 20 -l 15 -n -t 1m
 
 # set background
-exec --no-startup-id feh --bg-fill ~/pics/wallpaper.jpg
-exec --no-startup-id sleep 0.1 && feh --bg-fill ~/pics/wallpaper.jpg
-exec_always --no-startup-id launch_polybar
-
-# applications
-exec --no-startup-id execdelay 1.5 spotify
-
-exec --no-startup-id "i3-msg 'workspace 9; append_layout /home/marcel/.i3/comms.jsonc'"
-exec --no-startup-id execdelay 1.5 discord
-exec signal-desktop
+exec --no-startup-id feh --bg-center ~/Pictures/arch_split_blue.png
+exec --no-startup-id polybar -q -r main
 
 # wicd
 # exec --no-startup-id wicd-client --tray
@@ -351,13 +318,7 @@ exec --no-startup-id unclutter
 exec --no-startup-id dunst
 exec --no-startup-id compton --config /home/marcel/.i3/compton.conf
 exec --no-startup-id xinput --set-prop "Elan Touchpad" "libinput Natural Scrolling Enabled" 1
-exec --no-startup-id xbindkeys --poll-rc
-exec --no-startup-id /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
 
 #exec_always --no-startup-id xautolock -time 10 -locker 'betterlockscreen -l'
-#exec_always --no-startup-id autorandr-launcher
+exec_always --no-startup-id autorandr-launcher
 exec_always --no-startup-id xrdb -merge /home/marcel/.Xresources
-exec_always --no-startup-id /home/marcel/.screenlayout/grz.sh
-exec_always --no-startup-id /home/marcel/source/wacom-switcher/main.py
-exec --no-startup-id solaar -w hide
-exec --no-startup-id wacom-l
