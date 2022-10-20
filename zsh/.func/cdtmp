@@ -12,4 +12,4 @@ else
   target=`mktemp -d "/tmp/cdtmp.XXX"`
 fi
 
-cd "$target"
+pushd "$target" > /dev/null
