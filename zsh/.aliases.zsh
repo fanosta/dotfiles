@@ -34,6 +34,9 @@ alias whatthecommit='gc -t <(curl -Ss whatthecommit.com | tr -d "\n" | grep -oP 
 
 # git aliases
 source ~/.aliases.git.zsh
+alias gid='git difftool --no-prompt --extcmd=icdiff'
+alias gidca='git difftool --no-prompt --extcmd=icdiff --cached'
+alias gids='git difftool --no-prompt --extcmd=icdiff --staged'
 
 alias mx='chmod +x'
 alias m='make -j16'

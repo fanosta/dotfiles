@@ -1,3 +1,5 @@
+if [ "$TMUX" = "" ]; then exec tmux; fi
+
 POWERLEVEL10K_HOME=~/.powerlevel10k
 if [[ ! -e "$POWERLEVEL10K_HOME"/powerlevel10k.zsh-theme ]]; then
   git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$POWERLEVEL10K_HOME"
