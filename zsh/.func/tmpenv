@@ -1,0 +1,9 @@
+#!/bin/zsh
+
+dir=`mktemp -d` &&
+cd "$dir" &&
+
+virtualenv . &&
+source bin/activate
+
+alias ipy="python -c 'import IPython; IPython.terminal.ipapp.launch_new_instance()'"

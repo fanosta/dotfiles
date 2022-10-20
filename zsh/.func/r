@@ -1,0 +1,8 @@
+#!/usr/bin/zsh
+if [ -n "$RANGER_LEVEL" ]; then
+    exit
+fi
+tmpfile=$(mktemp -t 'ranger_cwd.XXXXXXXXX')
+ranger --choosedir="$tmpfile" $@
+cd "$(cat $tmpfile)"
+\rm "$tmpfile"

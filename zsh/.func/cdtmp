@@ -1,0 +1,15 @@
+#!/bin/zsh
+
+if [[ $# -gt 2 ]]; then
+  echo "usage: cdtmp [prefix]" >&2
+  return 1
+fi
+
+
+if [[ $# -eq 1 ]]; then
+  target=`mktemp -d "/tmp/$1.XXX"`
+else
+  target=`mktemp -d "/tmp/cdtmp.XXX"`
+fi
+
+cd "$target"

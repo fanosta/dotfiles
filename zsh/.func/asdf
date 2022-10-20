@@ -1,0 +1,4 @@
+#!/bin/zsh
+
+addr
+python3 -m http.server "$@"
