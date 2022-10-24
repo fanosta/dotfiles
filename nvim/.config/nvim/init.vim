@@ -260,6 +260,7 @@ tnoremap <Esc> <C-\><C-n>
 
 " vim workspace
 let g:workspace_session_disable_on_args = 1
+let g:workspace_autosave = 0
 
 "FZF foo
 let g:fzf_action = {
