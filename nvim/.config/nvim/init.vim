@@ -83,10 +83,25 @@ Plug 'fanosta/hotcrp_vim'
 "Plug 'Valloric/YouCompleteMe', { 'do': './install.py --clang-completer' }
 "Plug 'glacambre/firenvim', { 'do': { _ -> firenvim#install(0) } }
 Plug 'derekwyatt/vim-fswitch'
+"Plug 'agude/vim-eldar' "color scheme eldar
+Plug 'sonph/onehalf', {'rtp': 'vim/'}
 call plug#end()
 
+" color scheme
+syntax enable
+"set background=dark
+set termguicolors
+"let g:neosolarized_contrast = "high"
+"let g:neosolarized_visibility = "high"
+"colorscheme NeoSolarized
+colorscheme onehalfdark
+let g:airline_theme='onehalfdark'
+"let g:lightline.colorscheme='onehalfdark'
+
+
+
 "lightline
-let g:lightline={'colorscheme': 'solarized'}
+let g:lightline={'colorscheme': 'onehalfdark'}
 "let g:lightline = {
 "      \ 'colorscheme': 'solarized',
 "      \ 'active': {
@@ -100,13 +115,6 @@ let g:lightline={'colorscheme': 'solarized'}
 
 set laststatus=2
 set noshowmode
-
-syntax enable
-set background=dark
-set termguicolors
-let g:neosolarized_contrast = "high"
-let g:neosolarized_visibility = "high"
-colorscheme NeoSolarized
 
 " YouCompleteMe
 set completeopt-=preview
