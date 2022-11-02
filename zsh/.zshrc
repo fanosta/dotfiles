@@ -12,7 +12,6 @@ fi
 
 # clone on demand
 POWERLEVEL10K_HOME=~/.powerlevel10k
-OH_MY_ZSH=~/.oh-my-zsh
 if [[ ! -e "$POWERLEVEL10K_HOME"/powerlevel10k.zsh-theme ]]; then
   git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$POWERLEVEL10K_HOME"
 fi
@@ -20,11 +19,6 @@ fi
 if [[ ! -e "${ZDOTDIR:-$HOME}/.zprezto" ]]; then
   git clone --recursive https://github.com/sorin-ionescu/prezto.git "${ZDOTDIR:-$HOME}/.zprezto"
 fi
-
-if [[ ! -e "$OH_MY_ZSH"/oh-my-zsh.sh ]]; then
-  git clone https://github.com/ohmyzsh/ohmyzsh.git "$OH_MY_ZSH"
-fi
-
 
 source "${ZDOTDIR:-$HOME}/.zprezto/init.zsh"
 source "$POWERLEVEL10K_HOME"/powerlevel10k.zsh-theme
@@ -71,6 +65,7 @@ bindkey "$terminfo[kcud1]" down-line-or-beginning-search # Down
 
 
 source ~/.aliases.zsh
+source ~/.aliases.git.zsh
 fpath=(~/.func $fpath)
 autoload ~/.func/*
 
