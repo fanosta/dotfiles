@@ -20,6 +20,9 @@ if [[ ! -e "${ZDOTDIR:-$HOME}/.zprezto" ]]; then
   git clone --recursive https://github.com/sorin-ionescu/prezto.git "${ZDOTDIR:-$HOME}/.zprezto"
 fi
 
+autoload -Uz compinit
+compinit
+
 source "${ZDOTDIR:-$HOME}/.zprezto/init.zsh"
 source "$POWERLEVEL10K_HOME"/powerlevel10k.zsh-theme
 
