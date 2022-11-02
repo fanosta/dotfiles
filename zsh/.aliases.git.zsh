@@ -118,21 +118,21 @@ alias gcs='git commit -S'
 alias gcss='git commit -S -s'
 alias gcssm='git commit -S -s -m'
 
-alias gd='git diff'
-alias gdca='git diff --cached'
-alias gdcw='git diff --cached --word-diff'
+alias gd='git -p diff'
+alias gdca='git -p diff --cached'
+alias gdcw='git -p diff --cached --word-diff'
 alias gdct='git describe --tags $(git rev-list --tags --max-count=1)'
-alias gds='git diff --staged'
-alias gdt='git diff-tree --no-commit-id --name-only -r'
-alias gdup='git diff @{upstream}'
-alias gdw='git diff --word-diff'
+alias gds='git -p diff --staged'
+alias gdt='git -p diff-tree --no-commit-id --name-only -r'
+alias gdup='git -p diff @{upstream}'
+alias gdw='git -p diff --word-diff'
 
 function gdnolock() {
-  git diff "$@" ":(exclude)package-lock.json" ":(exclude)*.lock"
+  git -p diff "$@" ":(exclude)package-lock.json" ":(exclude)*.lock"
 }
 compdef _git gdnolock=git-diff
 
-function gdv() { git diff -w "$@" | view - }
+function gdv() { git -p diff -w "$@" | view - }
 compdef _git gdv=git-diff
 
 alias gf='git fetch'
@@ -336,3 +336,8 @@ function grename() {
 }
 
 unset git_version
+
+
+alias gid='git -p difftool --no-prompt --extcmd=icdiff'
+alias gidca='git -p difftool --no-prompt --extcmd=icdiff --cached'
+alias gids='git -p difftool --no-prompt --extcmd=icdiff --staged'
