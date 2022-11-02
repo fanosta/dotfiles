@@ -2,7 +2,9 @@ if [[ ! -z "$SSH_CLIENT" ]] || [[ ! -z "$SSH_TTY" ]] && [[ -z $TMUX ]]; then
   exec tmux new-session -At ssh
 fi
 
-export EDITOR=$(basename $(which nvim || which vim || which vi 2>/dev/null))
+which vi > /dev/null && export EDITOR=vi
+which vim > /dev/null && export EDITOR=vim
+which nvim > /dev/null && export EDITOR=nvim
 
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
