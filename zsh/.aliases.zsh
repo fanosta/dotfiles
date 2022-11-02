@@ -1,11 +1,13 @@
 # aliases
 # exa
-alias exa='exa --group-directories-first'
-alias l='exa --git-ignore --git -l'
-alias ldot='exa --git -ld .*'
-alias la='exa --git -la'
-alias ls='exa'
-alias lg='exa --git-ignore'
+if which exa &> /dev/null; then
+    alias exa='exa --group-directories-first'
+    alias l='exa --git-ignore --git -l'
+    alias ldot='exa --git -ld .*'
+    alias la='exa --git -la'
+    alias ls='exa'
+    alias lg='exa --git-ignore'
+fi
 
 # personal aliases
 alias xc='xclip -selection clipboard'

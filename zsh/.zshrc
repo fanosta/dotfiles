@@ -2,6 +2,8 @@ if [[ ! -z "$SSH_CLIENT" ]] || [[ ! -z "$SSH_TTY" ]] && [[ -z $TMUX ]]; then
   exec tmux new-session -At ssh
 fi
 
+which nvim &> /dev/null && export EDITOR=nvim || which vim &> /dev/null && export EDITOR=vim || export EDITOR=vi
+
 
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
@@ -30,14 +32,16 @@ source "$POWERLEVEL10K_HOME"/powerlevel10k.zsh-theme
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
 # ssh agent setup
-if [ -f ~/.ssh/agent.env ] ; then
-    . ~/.ssh/agent.env > /dev/null
-    if ! kill -0 $SSH_AGENT_PID > /dev/null 2>&1; then
+if [[ -z "$SSH_AUTH_SOCK" ]] then
+    if [[ -f ~/.ssh/agent.env ]] ; then
+        source ~/.ssh/agent.env > /dev/null
+        if ! kill -0 $SSH_AGENT_PID > /dev/null 2>&1; then
+            eval `ssh-agent | tee ~/.ssh/agent.env` > /dev/null
+        fi
+    else
         eval `ssh-agent | tee ~/.ssh/agent.env` > /dev/null
+        ssh-add
     fi
-else
-    eval `ssh-agent | tee ~/.ssh/agent.env` > /dev/null
-    ssh-add
 fi
 
 # history
