@@ -75,7 +75,6 @@ alias .....='../../../..'
 alias ......='../../../../..'
 alias .......='../../../../../..'
 
-setopt cshjunkiequotes # disallow multiline quoted string literals
 setopt histignorespace # don't save commands tarting with space to history
 
 # better history scroll
