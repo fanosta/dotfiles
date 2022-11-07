@@ -96,4 +96,6 @@ source ~/.aliases.git.zsh
 fpath=(~/.func $fpath)
 autoload ~/.func/*
 
-#trap 'src' SIGURG
+# reload ~/.zshrc on SIGURG
+trap 'echo reloading \~/.zshrc; source ~/.zshrc' SIGURG
+alias srcall='killall -URG zsh'
