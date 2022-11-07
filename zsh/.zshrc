@@ -75,6 +75,10 @@ zle -N down-line-or-beginning-search
 bindkey "$terminfo[kcuu1]" up-line-or-beginning-search # Up
 bindkey "$terminfo[kcud1]" down-line-or-beginning-search # Down
 
+# jump words with ctrl-left/right
+bindkey "$terminfo[kLFT5]" backward-word # CTRL-Left
+bindkey "$terminfo[kRIT5]" forward-word # CTRL-Right
+
 
 source ~/.aliases.zsh
 source ~/.aliases.git.zsh
