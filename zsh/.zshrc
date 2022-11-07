@@ -62,6 +62,10 @@ bindkey '^x^e' edit-command-line
 bindkey '^U' backward-kill-line
 bindkey '^K' kill-line
 
+# make ctrl-w break on special chars
+autoload -U select-word-style
+select-word-style bash
+WORDCHARS='.-'
 
 # better history scroll
 autoload -U up-line-or-beginning-search
