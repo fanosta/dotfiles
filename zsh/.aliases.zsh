@@ -9,6 +9,17 @@ if which exa &> /dev/null; then
     alias lg='exa --git-ignore'
 fi
 
+# global aliases
+alias -g L='| less -R'
+alias -g H='| head'
+alias -g T='| tail'
+alias -g NE='2>/dev/null'
+
+# reduce danger
+alias rm-='rm -i'
+alias cp-='cp -i'
+alias mv-='mv -i'
+
 # personal aliases
 alias xc='xclip -selection clipboard'
 alias psgrep='ps aux | head -n 1; ps aux | grep -v grep | grep $1'

@@ -67,6 +67,17 @@ autoload -U select-word-style
 select-word-style bash
 WORDCHARS='.-'
 
+# autocd
+setopt autocd
+alias ...='../..'
+alias ....='../../..'
+alias .....='../../../..'
+alias ......='../../../../..'
+alias .......='../../../../../..'
+
+setopt cshjunkiequotes # disallow multiline quoted string literals
+setopt histignorespace # don't save commands tarting with space to history
+
 # better history scroll
 autoload -U up-line-or-beginning-search
 autoload -U down-line-or-beginning-search
