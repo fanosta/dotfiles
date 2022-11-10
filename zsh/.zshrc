@@ -30,7 +30,7 @@ source "${ZDOTDIR:-$HOME}/.zprezto/init.zsh"
 source "$POWERLEVEL10K_HOME"/powerlevel10k.zsh-theme
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+[[ ! -f "${ZDOTDIR:-$HOME}/.p10k.zsh" ]] || source "${ZDOTDIR:-$HOME}/.p10k.zsh"
 
 # ssh agent setup
 if [[ -z "$SSH_AUTH_SOCK" ]] then
@@ -90,11 +90,11 @@ bindkey "$terminfo[kLFT5]" backward-word # CTRL-Left
 bindkey "$terminfo[kRIT5]" forward-word # CTRL-Right
 
 
-source ~/.aliases.zsh
-source ~/.aliases.git.zsh
-fpath=(~/.func $fpath)
+source "${ZDOTDIR:-$HOME}/.aliases.zsh"
+source "${ZDOTDIR:-$HOME}/.aliases.git.zsh"
+fpath=("${ZDOTDIR:-$HOME}/.func" $fpath)
 autoload ~/.func/*
 
 # reload ~/.zshrc on SIGURG
-trap 'echo reloading \~/.zshrc; source ~/.zshrc' SIGURG
+trap 'echo reloading \~/.zshrc; source "${ZDOTDIR:-$HOME}/.zshrc"' SIGURG
 alias srcall='killall -URG zsh'
