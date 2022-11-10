@@ -93,7 +93,7 @@ bindkey "$terminfo[kRIT5]" forward-word # CTRL-Right
 source "${ZDOTDIR:-$HOME}/.aliases.zsh"
 source "${ZDOTDIR:-$HOME}/.aliases.git.zsh"
 fpath=("${ZDOTDIR:-$HOME}/.func" $fpath)
-autoload ~/.func/*
+autoload "${ZDOTDIR:-$HOME}/.func/*"
 
 # reload ~/.zshrc on SIGURG
 trap 'echo reloading \~/.zshrc; source "${ZDOTDIR:-$HOME}/.zshrc"' SIGURG
