@@ -35,7 +35,6 @@ alias no_aslr='setarch `uname -m` -R'
 alias ip='ip --color=auto'
 alias ip6='ip -6'
 alias ip4='ip -4'
-alias gh='git help'
 alias gla='git pull --rebase --autostash'
 alias e="$EDITOR"
 alias CAPS='xdotool key Caps_Lock'
