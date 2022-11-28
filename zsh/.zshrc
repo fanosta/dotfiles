@@ -95,6 +95,19 @@ source "${ZDOTDIR:-$HOME}/.aliases.git.zsh"
 fpath=("${ZDOTDIR:-$HOME}/.func" $fpath)
 autoload "${ZDOTDIR:-$HOME}/.func/"*
 
+# use ctrl-z as fg
+fancy-ctrl-z () {
+  if [[ $#BUFFER -eq 0 ]]; then
+    BUFFER="fg"
+    zle accept-line
+  else
+    zle push-input
+    zle clear-screen
+  fi
+}
+zle -N fancy-ctrl-z
+bindkey '^Z' fancy-ctrl-z
+
 # reload ~/.zshrc on SIGURG
 trap 'echo reloading \~/.zshrc; source "${ZDOTDIR:-$HOME}/.zshrc"' SIGURG
 alias srcall='killall -URG zsh'

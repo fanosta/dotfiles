@@ -1,13 +1,28 @@
 # aliases
 # exa
 if which exa &> /dev/null; then
-    alias exa='exa --group-directories-first'
-    alias l='exa --git-ignore --git -l'
-    alias ldot='exa --git -ld .*'
-    alias la='exa --git -la'
-    alias ls='exa'
-    alias lg='exa --git-ignore'
+  # debian built versions don't support --git :(
+  if exa --git >/dev/null 2>&1; then
+    alias ls='exa -F --color=always --icons --group-directories-first --git'
+  else
+    alias ls='exa -F --color=always --icons --group-directories-first'
+  fi
+else
+  alias ls='ls --color=auto -F'
 fi
+
+# alias ls='ls --color=auto '
+alias l='ls -lFh'     #size,show type,human readable
+alias ll='ls -lFh'      #long list
+alias la='ls -lAFh'   #long list,show almost all,show type,human readable
+alias lr='ls -tRFh'   #sorted by date,recursive,show type,human readable
+alias lt='ls -ltFh'   #long list,sorted by date,show type,human readable
+alias ldot='ls -ld .*'
+alias lS='ls -1FSsh'
+alias lart='ls -1Fcart'
+alias lrt='ls -1Fcrt'
+alias lsr='ls -lARFh' #Recursive list of files and directories
+alias lsn='ls -1'     #A column contains name of files and directories
 
 # global aliases
 alias -g L='| less -R'
