@@ -1,2 +1,21 @@
 #!/bin/bash
-dig +short @resolver1.opendns.com myip.opendns.com
+sleep 1000 &
+sleep_pid=$!
+
+tmpfile=$(mktemp)
+trap "rm $tmpfile" EXIT
+
+{
+  dig +short @resolver1.opendns.com myip.opendns.com > "$tmpfile";
+  kill $sleep_pid 2>/dev/null;
+} &
+dig_pid=$!
+{
+  curl -s https://api.ipify.org/ > "$tmpfile"
+  kill $sleep_pid 2>/dev/null;
+} &
+curl_pid=$!
+wait $sleep_pid
+kill $dig_pid $sleep_pid 2>/dev/null
+cat $tmpfile | tr -d '\n'
+echo
