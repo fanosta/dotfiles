@@ -1,3 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 [[ -x /usr/bin/google-chrome-stable ]] && exec google-chrome-stable "$@"
 [[ -x /usr/bin/chromium ]] && exec chromium "$@"
+[[ -x /snap/bin/chromium ]] && exec chromium "$@"
