@@ -1,0 +1,9 @@
+#!/bin/sh
+
+basename=`basename "$1"`
+template="$basename.XXX.hex"
+tmpfile=`mktemp --tmpdir "$template"`
+xxd "$1" > "$tmpfile"
+"$EDITOR" "$tmpfile"
+xxd -r "$tmpfile" > "$1"
+rm "$tmpfile"

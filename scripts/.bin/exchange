@@ -1,0 +1,2 @@
+#!/bin/sh
+exec renameat2 -e "$@"

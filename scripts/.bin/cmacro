@@ -1,0 +1,41 @@
+#!/bin/bash
+
+# check usage
+if [[ $# -eq 0 ]]; then
+    echo "usage: cmacro [headers..] MACRO" >&2
+    exit 1
+fi
+
+# generate temporary file
+f=$(mktemp --suffix=.c)
+
+echo '#include <stdio.h>' >> $f
+echo '#include <stdlib.h>' >> $f
+echo '#include <string.h>' >> $f
+echo '#include <errno.h>' >> $f
+echo '#include <signal.h>' >> $f
+echo '#include <unistd.h>' >> $f
+echo '#include <limits.h>' >> $f
+echo '#include <float.h>' >> $f
+echo '#include <sys/syscall.h>' >> $f
+echo '#include <elf.h>' >> $f
+echo '#include <assert.h>' >> $f
+
+# add headers
+while [[ $# -gt 1 ]]; do
+    echo '#include <'"$1"'>' >> "$f"
+    shift
+done
+
+# add marker
+marker="================================================================================"
+echo "$marker" >> "$f"
+
+# add macro calls
+echo "$1" >> "$f"
+
+# expand macros and strip marker
+gcc -DNDEBUG -I. -P -E "$f" | sed -n -e '/'"$marker"'/,$p' | tail -n+2
+
+# remove temporary file
+rm "$f"

@@ -1,0 +1,14 @@
+#!/bin/bash
+
+if [[ " $@ " =~ "-output-directory" ]]; then
+    exec /usr/bin/pdflatex "$@"
+fi
+
+tmpdir=$(mktemp -d)
+trap "rm -rf $tmpdir" EXIT
+
+/usr/bin/pdflatex -output-directory "$tmpdir" "$@"
+ret=$?
+
+cp -rf "$tmpdir/"* .
+exit $ret

@@ -1,0 +1,37 @@
+#!/bin/bash
+set -euo pipefail
+
+tmpdir=$(mktemp -d /tmp/floating_scrot_XXXXXX)
+cd "$tmpdir"
+scrot -s
+
+filename=$(echo *)
+geometry=$(echo "$filename" | cut -d_ -f2)
+
+echo sxiv -g "$geometry" -b "$filename"
+feh "$filename" &
+pid="$!"
+
+
+# Wait for the window to open and grab its window ID
+winid=''
+while : ; do
+    winid="`wmctrl -lp | awk -vpid=$pid '$3==pid {print $1; exit}'`"
+    [[ -z "${winid}" ]] || break
+done
+
+# Focus the window we found
+wmctrl -ia "${winid}"
+
+# Make it float
+i3-msg floating enable > /dev/null;
+i3-msg border pixel 0 > /dev/null;
+
+# Move it to the center for good measure
+i3-msg move position center > /dev/null;
+
+# Wait for the application to quit
+wait "${pid}";
+
+cd
+rm -rf "$tmpdir"

@@ -1,0 +1,28 @@
+#!/usr/bin/env python3
+
+if __name__ == '__main__':
+    try:
+        path = f'/sys/devices/platform/thinkpad_acpi/dytc_lapmode'
+        with open(path, 'r') as f:
+            lapmode = bool(int(f.read()))
+            print(f"lapmode: {lapmode}")
+
+    except FileNotFoundError:
+        pass
+
+
+    for idx in range(100):
+        try:
+            name_path = f'/sys/devices/virtual/powercap/intel-rapl-mmio/intel-rapl-mmio:0/constraint_{idx}_name'
+            max_path = f'/sys/devices/virtual/powercap/intel-rapl-mmio/intel-rapl-mmio:0/constraint_{idx}_max_power_uw'
+            uw_path = f'/sys/devices/virtual/powercap/intel-rapl-mmio/intel-rapl-mmio:0/constraint_{idx}_power_limit_uw'
+            with open(name_path, 'r') as f:
+                print(f.read().strip(), end=": ")
+            with open(uw_path, 'r') as f:
+                power_limit = int(f.read()) / 10**6
+                print(f"{power_limit:.1f} W", end=" ")
+            with open(max_path, 'r') as f:
+                max_power_limit = int(f.read()) / 10**6
+                print(f"(max = {max_power_limit:.1f} W)")
+        except FileNotFoundError:
+            break

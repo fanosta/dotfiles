@@ -1,0 +1,14 @@
+#!/bin/bash
+
+set -eu
+
+id=$(xclip -selection clipboard -o)
+
+if ! grep -qP '^\d{18}$' <(echo "$id"); then
+  echo not a Disocrd user ID
+  exit 1
+fi
+
+link="https://discordapp.com/users/$id"
+echo -n "$link" | xclip -selection clipboard
+echo "$link"

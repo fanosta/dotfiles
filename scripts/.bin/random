@@ -1,0 +1,2 @@
+#!/bin/bash
+exec openssl enc -aes-128-ctr -pass file:<(head -c16 /dev/urandom | hexdump -e '"%x"') -nosalt </dev/zero 2>/dev/null

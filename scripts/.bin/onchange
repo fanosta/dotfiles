@@ -1,0 +1,10 @@
+#!/bin/bash
+
+target_file=$1
+shift
+
+while true;
+do
+  inotifywait -e close_write "$target_file" >/dev/null 2>&1
+  "$@";
+done

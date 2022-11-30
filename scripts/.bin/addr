@@ -1,0 +1,5 @@
+#!/bin/bash
+devices=$((ip -6 route show; ip -4 route show) | grep default | grep -oP "(?<=dev )\S*" | sort -u)
+for dev in $devices; do
+  ip --color=auto addr show dev $dev
+done

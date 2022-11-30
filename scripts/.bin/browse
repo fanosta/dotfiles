@@ -1,0 +1,8 @@
+#!/bin/bash
+export WAYLAND_DISPLAY=
+
+url="$1"
+echo "$url" | grep -qP '^https?://' || url="https://$url"
+
+nohup chrome --app="$url" >/dev/null 2>/dev/null &
+disown

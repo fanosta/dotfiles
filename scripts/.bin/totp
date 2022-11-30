@@ -1,0 +1,32 @@
+#!/usr/bin/env python3
+import time
+import hmac
+import json
+import sys
+from os import path
+
+from binascii import hexlify, unhexlify
+from base64 import b32decode
+
+def truncate(h):
+    offset = h[-1] & 0x0F
+    P = h[offset:offset+4]
+    return int.from_bytes(P, 'big') & 0x7FFFFFFF
+
+def hotp(key, counter, digest='sha1', digits=6):
+    h = hmac.new(key, counter.to_bytes(8, 'big'), digestmod=digest).digest()
+    return truncate(h) % (10**digits)
+
+if __name__ == '__main__':
+    cfg_path = sys.argv[1] if len(sys.argv) == 2 else path.expanduser("~/.totp.conf")
+    with open(cfg_path, 'r') as f:
+        cfg = json.load(f)
+
+    key = b32decode(cfg['key'])
+    timestep = cfg.get('timestep', 30)
+    digest = cfg.get('digest', 'SHA1')
+    digits = cfg.get('digits', 6)
+
+    counter = int(time.time()) // timestep
+    otp = hotp(key, counter, digest, digits)
+    print(otp)

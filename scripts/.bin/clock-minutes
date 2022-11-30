@@ -1,0 +1,2 @@
+#!/bin/bash
+exec browse "https://www.nayuki.io/res/full-screen-clock-javascript/full-screen-clock-24hr.html"

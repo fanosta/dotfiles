@@ -1,0 +1,9 @@
+#!/bin/sh
+
+_FZF_DEFAULT_COMMAND='rg --files --hidden --follow -g "!{.git,node_modules}/*" 2> /dev/null'
+_FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+
+#export FZF_DEFAULT_COMMAND="${FZF_DEFAULT_COMMAND+$_FZF_DEFAULT_COMMAND}"
+#export FZF_CTRL_T_COMMAND="${FZF_CTRL_T_COMMAND+$_FZF_CTRL_T_COMMAND}"
+
+exec /usr/bin/fzf "$@"

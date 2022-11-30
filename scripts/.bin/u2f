@@ -1,0 +1,4 @@
+#!/bin/bash
+otp=$(totp)
+echo -n $otp | xc
+echo $otp

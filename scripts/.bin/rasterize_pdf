@@ -1,0 +1,11 @@
+#!/bin/bash
+set -eu
+
+input="$1"
+output="$2"
+tmpfile=$(mktemp)
+
+trap "rm $tmpfile" EXIT
+
+pdf2djvu -d 300 "$input" > "$tmpfile"
+ddjvu -format=pdf -quality=95 "$tmpfile" "$output"

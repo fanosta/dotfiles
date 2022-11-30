@@ -1,0 +1,10 @@
+#!/bin/bash
+
+if grep -Paq 'sh\x00\./[a-zA-Z0-9]+\.py' /proc/$PPID/cmdline
+then
+    ponysay fix your shebang
+    kill $PPID
+    exit 0
+fi
+
+exit 1
