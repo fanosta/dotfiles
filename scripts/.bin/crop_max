@@ -1,0 +1,44 @@
+#!/usr/bin/env python3
+from typing import *
+
+import subprocess as sp
+import sys, os
+from os import path
+import tempfile
+import re
+
+
+def get_max_bounding_box(infile: str):
+    output = sp.check_output(['pdfcrop', '--debug', infile, '/dev/null'])
+    output = output.decode()
+    #print(output)
+
+    pattern = re.compile(r'^%%BoundingBox: (\d+) (\d+) (\d+) (\d+)$', re.M)
+
+    a, b, c, d = float('inf'), float('inf'), 0, 0
+    for match in pattern.finditer(output):
+        a = min(a, int(match[1]))
+        b = min(b, int(match[2]))
+        c = max(c, int(match[3]))
+        d = max(d, int(match[4]))
+
+    return a, b, c, d
+
+def crop(infile: str, bbox: Tuple[int, int, int, int]):
+    sp.check_call(['pdfcrop', '--bbox', ' '.join(str(x) for x in bbox), infile])
+
+if __name__ == '__main__':
+    infile = sys.argv[1]
+
+    oldworkdir = os.getcwd()
+    with tempfile.TemporaryDirectory() as workdir:
+        infile_abs = os.path.abspath(infile)
+
+        os.chdir(workdir)
+        try:
+            bbox = get_max_bounding_box(infile_abs)
+        finally:
+            os.chdir(oldworkdir)
+
+        crop(infile, bbox)
+
