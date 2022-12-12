@@ -59,6 +59,8 @@ if __name__ == '__main__':
 
     for file in files:
         cwd = os.getcwd()
-        os.chdir(os.path.dirname(file.name))
+        dirname = os.path.dirname(file.name)
+        if dirname != '':
+            os.chdir(dirname)
         send_email(file)
         os.chdir(cwd)
