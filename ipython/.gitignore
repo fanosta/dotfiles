@@ -1,2 +1,5 @@
 history.sqlite
 README
+.ipython/profile_*/db/
+.ipython/profile_*/log/
+.ipython/profile_*/pid/
