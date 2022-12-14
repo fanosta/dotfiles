@@ -31,16 +31,15 @@ alias -g T='| tail'
 alias -g NE='2>/dev/null'
 
 # reduce danger
-alias rm-='rm -i'
-alias cp-='cp -i'
-alias mv-='mv -i'
+alias rm='rm -i'
+alias cp='cp -i --reflink=auto'
+alias mv='mv -i'
 
 # personal aliases
 alias xc='xclip -selection clipboard'
 alias psgrep='ps aux | head -n 1; ps aux | grep -v grep | grep $1'
 # alias cdtmp='cd $(mktemp -d)'
 alias mktmp='mktemp'
-alias cp='cp --reflink=auto'
 alias se='sudoedit'
 alias hd='hexdump -C'
 which ipython3 > /dev/null && alias p3='ipython3' || alias p3='python3'
