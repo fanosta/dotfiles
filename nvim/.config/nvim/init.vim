@@ -85,6 +85,7 @@ Plug 'fanosta/hotcrp_vim'
 Plug 'derekwyatt/vim-fswitch'
 "Plug 'agude/vim-eldar' "color scheme eldar
 Plug 'sonph/onehalf', {'rtp': 'vim/'}
+Plug 'tpope/vim-commentary'
 call plug#end()
 
 " color scheme
@@ -121,9 +122,12 @@ set completeopt-=preview
 let g:ycm_folder='$HOME/.config/nvim/plugins/YouCompleteMe/'
 let g:ycm_server_python_interpreter='/usr/bin/python3'
 
-nmap <silent> gd :YcmCompleter GoToDefinition<CR>
-nmap <silent> gD :YcmCompleter GoToDeclaration<CR>
-nmap <silent> gr :YcmCompleter GoToReferences<CR>
+" ALE
+" let g:ale_linters = {'python': ['flake8'], 'tex': []}
+" 
+" nmap <silent> gd :ALEGoToImplementation<CR>
+" nmap <silent> gD :ALEGoToDefinition<CR>
+" nmap <silent> gr :ALEFindReferences<CR>
 
 function SetCompleteMode(mode)
     if !exists('g:ycm_force_mode') || !g:ycm_force_mode
@@ -168,6 +172,7 @@ autocmd Syntax markdown set spell
 autocmd Syntax gitcommit set spell
 autocmd Syntax rst set spell
 autocmd Syntax text set spell
+autocmd Syntax mail set spell
 
 autocmd Syntax go IndentMode t 4
 
