@@ -1,0 +1,122 @@
+#!/usr/bin/env python3
+"""
+rename a set of files by editing their names in your editor.
+"""
+from __future__ import annotations
+
+from os import path, environ
+import sys
+import argparse
+import subprocess as sp
+
+from tempfile import NamedTemporaryFile
+
+from typing import *
+
+DEFAULT_EDITOR='vim'
+
+def get_editor():
+    editor = environ.get('EDITOR', default=DEFAULT_EDITOR)
+    visual = environ.get('VISUAL', default=editor)
+    return visual
+
+def remove_suffix(s: str, suffix: str):
+    if s.endswith(suffix):
+        return s[:-len(suffix)]
+    return s
+
+def edit_filenames(oldnames: List[str]):
+    with NamedTemporaryFile('w', prefix='bulkrename_', suffix='.txt') as f:
+        f.file.writelines((filename + '\n' for filename in oldnames))
+        f.file.close()
+
+        sp.check_call([get_editor(), f.name])
+
+        with open(f.name, 'r') as fnew:
+            newnames = [remove_suffix(s, '\n') for s in fnew]
+    return newnames
+
+def build_operations(oldnames: List[str], newnames: List[str]):
+    ops: List[Tuple[str, str]] = []
+    extra_ops: List[Tuple[str, str]] = []
+
+    cleaned = [(src, dst) for src, dst in zip(oldnames, newnames) if src != dst]
+    for i, (src, dst) in enumerate(cleaned):
+        if dst in oldnames[i+1:]:
+            prefix, suffix = path.splitext(path.basename(src))
+            dir = path.dirname(src)
+
+            with NamedTemporaryFile(prefix=prefix + '.', suffix=suffix, dir=dir) as f:
+                tmp = path.relpath(f.name)
+
+            extra_ops.append((tmp, dst))
+            dst = tmp
+        ops.append((src, dst))
+
+    ops = ops + extra_ops
+    dirs = (path.dirname(dst) for _, dst in ops)
+    dirs = (dir for dir in dirs if dir != '')
+    dirs = (dir for dir in dirs if not path.isdir(dir))
+
+    return list(dirs), ops
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('files', metavar='file', nargs='+')
+    args = parser.parse_args()
+
+    oldnames = args.files
+
+    ok = True
+    for filename in oldnames:
+        if '\n' in filename:
+            print('filename {filename!r} must not contain newlines')
+            ok = False
+        if not path.exists(filename):
+            print(f'file {filename!r} does not exist.')
+            ok = False
+    if not ok:
+        sys.exit(1)
+
+    # remove duplicates
+    oldnames = [x for i, x in enumerate(oldnames) if x not in oldnames[:i]]
+    newnames = edit_filenames(oldnames)
+
+    if len(newnames) != len(oldnames):
+        print(f'expected {len(oldnames)} new filenames, got {len(newnames)}')
+        sys.exit(1)
+
+    ok = True
+    for i, fname in enumerate(newnames):
+        if fname in newnames[:i]:
+            print(f'duplicate destination: {fname!r}')
+            ok = False
+    if not ok:
+        sys.exit(1)
+
+    newdirs, renames = build_operations(oldnames, newnames)
+    if len(newdirs) == 0 and len(renames) == 0:
+        print('There is nothing to do.')
+        sys.exit(0)
+
+    print('The following operations will be performed:')
+    for newdir in newdirs:
+        print(f'mkdir -vp {newdir!r}')
+    for src, dst in renames:
+        print(f'mv -vi {src!r} {dst!r}')
+    print()
+
+    char = ''
+    while char.lower() not in ['y', 'n']:
+        print('do you want to continue? (y/n)', end=' ')
+        char = input().strip()
+
+    if char.lower() != 'y':
+        print('aborted')
+        sys.exit(0)
+
+    for newdir in newdirs:
+        sp.check_call(['mkdir', '-vp', newdir])
+    for src, dst in renames:
+        sp.check_call(['mv', '-vi', src, dst])
