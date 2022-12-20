@@ -1,1 +1,1 @@
---target=~ --dotfiles
+--target=~ --dotfiles --ignore '.mypy_cache/' --ignore 'post_install'
