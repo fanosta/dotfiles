@@ -29,4 +29,4 @@ if __name__ == '__main__':
 
     counter = int(time.time()) // timestep
     otp = hotp(key, counter, digest, digits)
-    print(otp)
+    print(f'{otp:06d}')
