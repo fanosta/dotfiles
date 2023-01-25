@@ -13,6 +13,45 @@ from tempfile import NamedTemporaryFile
 
 from typing import *
 
+import difflib 
+
+def colorized_diff(old: str, new: str):
+    sm = difflib.SequenceMatcher(None, old, new)
+    opcodes = sm.get_opcodes()
+
+    RESET = '\x1b[m'
+    FMT = {
+        'replace': '\x1b[1;33m',
+        'delete': '\x1b[1;31m',
+        'insert': '\x1b[1;32m',
+        'equal': RESET,
+    }
+
+    res_old = ''
+    res_new = ''
+    state_old = RESET
+    state_new = RESET
+    for opc, i1, i2, j1, j2 in opcodes:
+        if i1 != i2:
+            if state_old != FMT[opc]:
+                res_old += FMT[opc]
+                state_old = FMT[opc]
+            res_old += old[i1:i2]
+        if j1 != j2:
+            if state_new != FMT[opc]:
+                res_new += FMT[opc]
+                state_new = FMT[opc]
+            res_new += new[j1:j2]
+
+    if state_old != RESET:
+        res_old += RESET
+
+    if state_new != RESET:
+        res_new += RESET
+
+    return res_old, res_new
+
+
 DEFAULT_EDITOR='vim'
 
 def get_editor():
@@ -57,8 +96,12 @@ def build_operations(oldnames: List[str], newnames: List[str]):
     dirs = (path.dirname(dst) for _, dst in ops)
     dirs = (dir for dir in dirs if dir != '')
     dirs = (dir for dir in dirs if not path.isdir(dir))
+    res_dirs = []
+    for d in dirs:
+        if d not in res_dirs:
+            res_dirs.append(d)
 
-    return list(dirs), ops
+    return res_dirs, ops
 
 
 if __name__ == '__main__':
@@ -104,7 +147,8 @@ if __name__ == '__main__':
     for newdir in newdirs:
         print(f'mkdir -vp {newdir!r}')
     for src, dst in renames:
-        print(f'mv -vi {src!r} {dst!r}')
+        colorized_src, colorized_dst = colorized_diff(repr(src), repr(dst))
+        print(f'mv -vi {colorized_src} {colorized_dst}')
     print()
 
     char = ''
