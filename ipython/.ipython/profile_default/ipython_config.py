@@ -128,7 +128,7 @@ c.TerminalIPythonApp.display_banner = False
 
 ## If a command or file is given via the command-line, e.g. 'ipython foo.py',
 #  start an interactive shell after executing the file or command.
-c.TerminalIPythonApp.force_interact = True
+c.TerminalIPythonApp.force_interact = False
 
 ## Class to use to instantiate the TerminalInteractiveShell object. Useful for
 #  custom Frontends
