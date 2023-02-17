@@ -1,8 +1,6 @@
-filetype plugin on
+filetype plugin indent on
 set modeline
 set modelines=5
-syntax on
-" filetype plugin indent on
 " line wrap
 set wrap linebreak
 
@@ -34,14 +32,11 @@ if !empty($WAYLAND_DISPLAY)
 endif
 
 
-set wildmenu
-
 set cursorline
-
 set expandtab
 set shiftwidth=2
 set softtabstop=2
-set printexpr=
+set printexpr= " prevent accidental printing
 
 " overlength
 " highlight OverLength ctermbg=darkgrey guibg=#111111
@@ -57,39 +52,59 @@ nnoremap <expr> gp '`[' . strpart(getregtype(), 0, 1) . '`]'
 
 " vim-plug
 call plug#begin('~/.local/share/nvim/plugged')
-"Plug 'scrooloose/nerdcommenter'
+Plug 'tpope/vim-sensible'
 Plug 'tpope/vim-repeat'
-"Plug 'easymotion/vim-easymotion'
+Plug 'tpope/vim-surround'
+Plug 'tpope/vim-fugitive'
+Plug 'tpope/vim-rhubarb'
+Plug 'tpope/vim-speeddating'
+Plug 'tpope/vim-commentary'
+Plug 'shumphrey/fugitive-gitlab.vim'
+" Plug 'easymotion/vim-easymotion'
 Plug 'itchyny/lightline.vim'
 Plug 'farmergreg/vim-lastplace'
-Plug 'tpope/vim-surround'
-"Plug 'SirVer/ultisnips'
-"Plug 'honza/vim-snippets'
+" Plug 'SirVer/ultisnips'
+" Plug 'honza/vim-snippets'
 "Plug 'luochen1990/rainbow'
 Plug 'airblade/vim-gitgutter'
-"Plug 'tpope/vim-fugitive'
-"Plug 'scrooloose/nerdtree'
+" Plug 'scrooloose/nerdtree'
 Plug 'lervag/vimtex'
-"Plug 'majutsushi/tagbar'
 Plug 'machakann/vim-highlightedyank'
 Plug 'tommcdo/vim-exchange'
 Plug 'nelstrom/vim-visual-star-search'
 Plug 'thaerkh/vim-workspace'
-"Plug 'vhdirk/vim-cmake'
 Plug 'junegunn/fzf'
 Plug 'junegunn/fzf.vim'
 Plug 'godlygeek/tabular'
-Plug 'fanosta/hotcrp_vim'
-"Plug 'Valloric/YouCompleteMe', { 'do': './install.py --clang-completer' }
-"Plug 'glacambre/firenvim', { 'do': { _ -> firenvim#install(0) } }
+Plug 'fanosta/hotcrp.vim'
+" Plug 'Valloric/YouCompleteMe', { 'do': './install.py --clang-completer' }
+" Plug 'glacambre/firenvim', { 'do': { _ -> firenvim#install(0) } }
 Plug 'derekwyatt/vim-fswitch'
-"Plug 'agude/vim-eldar' "color scheme eldar
+" Plug 'agude/vim-eldar' "color scheme eldar
 Plug 'sonph/onehalf', {'rtp': 'vim/'}
-Plug 'tpope/vim-commentary'
+" Plug 'dense-analysis/ale'
+" Plug 'ms-jpq/coq_nvim', {'branch': 'coq'}
+" Plug 'ms-jpq/coq.artifacts', {'branch': 'artifacts'} " 9000+ Snippets
+" Plug 'ms-jpq/coq.thirdparty', {'branch': '3p'}
+" Plug 'neovim/nvim-lspconfig'
 call plug#end()
 
+" COQ setup
+" local lsp = require "lspconfig"
+" local coq = require "coq" -- add this
+
+" lsp.<server>.setup(<stuff...>)                              -- before
+" lsp.<server>.setup(coq.lsp_ensure_capabilities(<stuff...>)) -- after
+
+" SpeedDating
+augroup dateformats
+	autocmd!
+	autocmd VimEnter * silent execute 'SpeedDatingFormat %d.%m.%Y'
+	autocmd VimEnter * silent execute 'SpeedDatingFormat %d.%m.%y'
+	autocmd VimEnter * silent execute 'SpeedDatingFormat %d. %B %Y'
+augroup END
+
 " color scheme
-syntax enable
 "set background=dark
 set termguicolors
 "let g:neosolarized_contrast = "high"
@@ -102,16 +117,19 @@ let g:airline_theme='onehalfdark'
 
 
 "lightline
-let g:lightline={'colorscheme': 'onehalfdark'}
-"let g:lightline = {
-"      \ 'colorscheme': 'solarized',
-"      \ 'active': {
-"      \   'right': [ [ 'lineinfo' ], [ 'percent', 'wordcount' ], [ 'fileformat', 'fileencoding', 'filetype' ] ]
-"      \ },
-"      \ 'component_function': {
-"      \   'wordcount': 'WordCount',
-"      \ },
-"      \ }
+let g:lightline = {
+      \ 'colorscheme': 'onehalfdark',
+      \ 'active': {
+      \   'left': [ [ 'mode', 'paste' ],
+      \             [ 'gitbranch', 'readonly', 'filename', 'modified' ] ]
+      \ },
+      \ 'component_function': {
+      \   'gitbranch': 'FugitiveHead'
+      \ },
+      \ }
+
+" fugitive
+let g:fugitive_gitlab_domains = ['https://extgit.iaik.tugraz.at', 'git.teaching.iaik.tugraz.at', 'git.losfuzzys.net']
 
 
 set laststatus=2
@@ -123,7 +141,7 @@ let g:ycm_folder='$HOME/.config/nvim/plugins/YouCompleteMe/'
 let g:ycm_server_python_interpreter='/usr/bin/python3'
 
 " ALE
-" let g:ale_linters = {'python': ['flake8'], 'tex': []}
+let g:ale_linters = {'python': ['mypy'], 'tex': []}
 " 
 " nmap <silent> gd :ALEGoToImplementation<CR>
 " nmap <silent> gD :ALEGoToDefinition<CR>
@@ -147,10 +165,10 @@ au FileType cpp CompleteMode cpp
 au FileType python CompleteMode python
 
 " splits
-nnoremap <C-J> <C-W><C-J>
-nnoremap <C-K> <C-W><C-K>
-nnoremap <C-L> <C-W><C-L>
-nnoremap <C-H> <C-W><C-H>
+" nnoremap <C-J> <C-W><C-J>
+" nnoremap <C-K> <C-W><C-K>
+" nnoremap <C-L> <C-W><C-L>
+" nnoremap <C-H> <C-W><C-H>
 
 set splitbelow
 set splitright
@@ -174,7 +192,16 @@ autocmd Syntax rst set spell
 autocmd Syntax text set spell
 autocmd Syntax mail set spell
 
-autocmd Syntax go IndentMode t 4
+set spelllang=en_us
+hi clear SpellBad
+hi clear SpellLocal
+hi clear SpellRare
+hi clear SpellCap
+hi SpellBad gui=undercurl guisp=#e06c75
+hi SpellCap gui=undercurl guisp=#61afef
+hi SpellLocal gui=undercurl guisp=#e5c07b
+hi SpellRare gui=undercurl guisp=#e5c07b
+
 
 " smart case
 set ignorecase
