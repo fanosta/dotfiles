@@ -87,6 +87,9 @@ Plug 'sonph/onehalf', {'rtp': 'vim/'}
 " Plug 'ms-jpq/coq.artifacts', {'branch': 'artifacts'} " 9000+ Snippets
 " Plug 'ms-jpq/coq.thirdparty', {'branch': '3p'}
 " Plug 'neovim/nvim-lspconfig'
+Plug 'mechatroner/rainbow_csv'
+Plug 'ctrlpvim/ctrlp.vim'
+Plug 'jiangmiao/auto-pairs'
 call plug#end()
 
 " COQ setup
@@ -157,7 +160,13 @@ function SetCompleteMode(mode)
 endfunction
 command -nargs=* CompleteMode call SetCompleteMode(<f-args>)
 
-nmap <silent> <C-p> :FZF<CR>
+" nmap <silent> <C-p> :FZF<CR>
+
+" Ctrl-P
+let g:ctrlp_max_files=0
+let g:ctrlp_max_depth=40
+let g:ctrlp_working_path_mode = ""
+let g:ctrlp_custom_ignore = 'node_modules\|DS_Store\|Cache\|bundle'
 
 
 au FileType c CompleteMode c
@@ -165,10 +174,10 @@ au FileType cpp CompleteMode cpp
 au FileType python CompleteMode python
 
 " splits
-" nnoremap <C-J> <C-W><C-J>
-" nnoremap <C-K> <C-W><C-K>
-" nnoremap <C-L> <C-W><C-L>
-" nnoremap <C-H> <C-W><C-H>
+nnoremap <C-J> <C-W><C-J>
+nnoremap <C-K> <C-W><C-K>
+nnoremap <C-L> <C-W><C-L>
+nnoremap <C-H> <C-W><C-H>
 
 set splitbelow
 set splitright
@@ -293,6 +302,9 @@ tnoremap <Esc> <C-\><C-n>
 " vim workspace
 let g:workspace_session_disable_on_args = 1
 let g:workspace_autosave = 0
+let g:workspace_autosave_untrailspaces = 0
+let g:workspace_session_directory = stdpath("data") . '/sessions/'
+let g:workspace_undodir = stdpath("data") . '/undodir/'
 
 "FZF foo
 let g:fzf_action = {
