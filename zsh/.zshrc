@@ -92,6 +92,7 @@ bindkey "$terminfo[kRIT5]" forward-word # CTRL-Right
 
 source "${ZDOTDIR:-$HOME}/.aliases.zsh"
 source "${ZDOTDIR:-$HOME}/.aliases.git.zsh"
+source "${ZDOTDIR:-$HOME}/.systemd.plugin.zsh"
 fpath=("${ZDOTDIR:-$HOME}/.func" $fpath)
 autoload "${ZDOTDIR:-$HOME}/.func/"*
 
