@@ -306,6 +306,11 @@ let g:workspace_autosave_untrailspaces = 0
 let g:workspace_session_directory = stdpath("data") . '/sessions/'
 let g:workspace_undodir = stdpath("data") . '/undodir/'
 
+" ignore most latex files for autocomplete
+set wildignore+=*.pdf,*.o,*.o.d,*.obj,*.jpg,*.png
+set wildignore+=*.aux,*.bbl,*.blg,*.lof,*.toc,*.out,*.nav,*.snm,*.vrb,*.bcf,*.run.xml,*.acn,*.acr,*.alg,*.glg,*.glo,*.gls,*.idx,*.ilg,*.ind,*.nlo,*.nls,*.xdy,*.glsdefs,*.tps,*.tcp,*.lot,*.xwm,*.synctex.gz,*.fls,*.fdb_latexmk,*.auxlock,*.dpth,*.md5,*.pdf
+set suffixes+=*.log " autocomplete log files but only at the bottom
+
 "FZF foo
 let g:fzf_action = {
   \ 'ctrl-t': 'tab split',
