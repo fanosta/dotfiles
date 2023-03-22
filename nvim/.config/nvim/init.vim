@@ -133,6 +133,7 @@ let g:lightline = {
 
 " fugitive
 let g:fugitive_gitlab_domains = ['https://extgit.iaik.tugraz.at', 'git.teaching.iaik.tugraz.at', 'git.losfuzzys.net']
+let g:fugitive_legacy_commands = 0
 
 
 set laststatus=2
