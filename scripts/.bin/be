@@ -1,0 +1,14 @@
+#!/bin/bash
+set -euo pipefail
+
+if test "$#" -ne 1; then
+    echo "usage: $0 <binary>"
+    exit 1
+fi
+
+cd "$HOME/.bin"
+$EDITOR "$HOME/.bin/$1"
+
+if [[ -f "$HOME/.bin/$1" ]]; then
+  chmod +x "$HOME/.bin/$1"
+fi
