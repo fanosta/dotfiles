@@ -36,7 +36,7 @@ set cursorline
 set expandtab
 set shiftwidth=2
 set softtabstop=2
-set printexpr= " prevent accidental printing
+" set printexpr= " prevent accidental printing
 
 " overlength
 " highlight OverLength ctermbg=darkgrey guibg=#111111
@@ -117,7 +117,16 @@ colorscheme onehalfdark
 let g:airline_theme='onehalfdark'
 "let g:lightline.colorscheme='onehalfdark'
 
-
+" wordcount
+let g:word_count=wordcount().words
+function WordCount()
+    if has_key(wordcount(),'visual_words')
+        let g:word_count=wordcount().visual_words."/".wordcount().words " count selected words
+    else
+        let g:word_count=wordcount().cursor_words."/".wordcount().words " or shows words 'so far'
+    endif
+    return g:word_count
+endfunction
 
 "lightline
 let g:lightline = {
