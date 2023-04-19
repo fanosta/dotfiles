@@ -2,8 +2,8 @@
 set -eu
 
 if grep -qi debian  /etc/os-release; then
-  commands=(stow curl nvim foobar)
-  packages=(stow curl neovim baz)
+  commands=(stow curl nvim)
+  packages=(stow curl neovim)
   pkgs=()
 
   for i in "${!commands[@]}"; do
