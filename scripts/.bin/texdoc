@@ -1,0 +1,9 @@
+#!/bin/bash
+set -euo pipefail
+tmpfile="/tmp/texdoc-$1.pdf"
+
+if [[ ! -f "$tmpfile" ]]; then
+  wget -O "$tmpfile" "http://texdoc.net/pkg/$1"
+fi
+
+rifle "$tmpfile"
