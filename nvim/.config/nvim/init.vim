@@ -77,6 +77,11 @@ Plug 'junegunn/fzf'
 Plug 'junegunn/fzf.vim'
 Plug 'godlygeek/tabular'
 Plug 'fanosta/hotcrp.vim'
+Plug 'madox2/vim-ai'
+"
+" Plug 'inkarkat/argtextobj.vim'
+" Plug 'gaving/vim-textobj-argument'
+"
 " Plug 'Valloric/YouCompleteMe', { 'do': './install.py --clang-completer' }
 " Plug 'glacambre/firenvim', { 'do': { _ -> firenvim#install(0) } }
 Plug 'derekwyatt/vim-fswitch'
@@ -102,7 +107,10 @@ call plug#end()
 " SpeedDating
 augroup dateformats
 	autocmd!
+	autocmd VimEnter * silent execute 'SpeedDatingFormat %d.%m.%y'
 	autocmd VimEnter * silent execute 'SpeedDatingFormat %d.%m.%Y'
+	autocmd VimEnter * silent execute 'SpeedDatingFormat %d.\,%m.\,%y'
+	autocmd VimEnter * silent execute 'SpeedDatingFormat %d.\,%m.\,%Y'
 	autocmd VimEnter * silent execute 'SpeedDatingFormat %d.%m.%y'
 	autocmd VimEnter * silent execute 'SpeedDatingFormat %d. %B %Y'
 augroup END
@@ -319,7 +327,8 @@ let g:workspace_undodir = stdpath("data") . '/undodir/'
 " ignore most latex files for autocomplete
 set wildignore+=*.pdf,*.o,*.o.d,*.obj,*.jpg,*.png
 set wildignore+=*.aux,*.bbl,*.blg,*.lof,*.toc,*.out,*.nav,*.snm,*.vrb,*.bcf,*.run.xml,*.acn,*.acr,*.alg,*.glg,*.glo,*.gls,*.idx,*.ilg,*.ind,*.nlo,*.nls,*.xdy,*.glsdefs,*.tps,*.tcp,*.lot,*.xwm,*.synctex.gz,*.fls,*.fdb_latexmk,*.auxlock,*.dpth,*.md5,*.pdf
-set suffixes+=*.log " autocomplete log files but only at the bottom
+set wildignore+=*.pdfpc,*.gnuplot,*.table
+set suffixes+=*.bib,*.log, " autocomplete log files but only at the bottom
 
 "FZF foo
 let g:fzf_action = {
