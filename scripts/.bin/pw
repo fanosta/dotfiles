@@ -1,3 +1,3 @@
 #!/bin/bash
-cat /dev/urandom | tr -dc '[:alnum:]' | head -c 16;
+cat /dev/urandom | tr -dc '0-9A-Za-z' | head -c ${1:-16};
 echo
