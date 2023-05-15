@@ -1,3 +1,20 @@
+#!/bin/bash
+
+set -eu
+
+# better settings for pop os shell
+
+# enter tiling mode with Super+r
+dconf write '/org/gnome/shell/extensions/pop-shell/tile-enter' "['<Super>r']"
+
+# terminal with Super+enter
+gsettings set org.gnome.settings-daemon.plugins.media-keys terminal '["<Super>Return"]'
+gsettings set org.gnome.settings-daemon.plugins.media-keys email '[""]'
+gsettings set org.gnome.settings-daemon.plugins.media-keys www '[""]'
+gsettings set org.gnome.desktop.wm.keybindings switch-input-source '[""]'
+gsettings set org.gnome.desktop.wm.keybindings switch-input-source-backward '[""]'
+
+
 # gsettings set org.gnome.shell.extensions.dash-to-dock hot-keys false
 gsettings set org.gnome.shell.keybindings switch-to-application-1 []
 gsettings set org.gnome.shell.keybindings switch-to-application-2 []
@@ -35,8 +52,6 @@ gsettings set org.gnome.desktop.wm.keybindings move-to-workspace-10 '["<Super><S
 # fixed workspaces
 gsettings set org.gnome.mutter dynamic-workspaces false
 gsettings set org.gnome.desktop.wm.preferences num-workspaces 10
-
-
 
 # gnome temrinal
 gsettings set org.gnome.Terminal.Legacy.Settings default-show-menubar false
