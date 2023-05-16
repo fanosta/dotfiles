@@ -77,6 +77,7 @@ Plug 'junegunn/fzf'
 Plug 'junegunn/fzf.vim'
 Plug 'godlygeek/tabular'
 Plug 'fanosta/hotcrp.vim'
+Plug 'vale1410/vim-minizinc'
 Plug 'madox2/vim-ai'
 "
 " Plug 'inkarkat/argtextobj.vim'
@@ -293,9 +294,9 @@ let g:tagbar_left = 1
 nmap <C-b> :TagbarToggle<CR>
 
 
-" nerd comment
-let g:NERDSpaceDelims = 1
-let g:NERDDefaultAlign = 'left'
+" vim commentary
+autocmd FileType zinc setlocal commentstring=%\ %s
+autocmd FileType cpp setlocal commentstring=// %s
 
 " cycle through tabs using H/L
 nnoremap H gT
