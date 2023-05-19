@@ -46,7 +46,8 @@ if [[ -z "$SSH_AUTH_SOCK" ]] then
 fi
 
 # only autocomplete temporary latex files for nvim if no other option left
-zstyle ':completion:*:*:nvim:*' file-patterns '^*.(log|aux|bbl|blg|lof|log|toc|out|nav|snm|vrb|bcf|run.xml|acn|acr|alg|glg|glo|gls|idx|ilg|ind|nlo|nls|xdy|glsdefs|tps|tcp|lot|xwm|synctex.gz|fls|fdb_latexmk|auxlock|dpth|md5|pdf):source-files' '*:all-files'
+zstyle ':completion:*:*:(vim|nvim):*' file-patterns '^*.(log|brf|xdv|aux|bbl|blg|lof|log|toc|out|nav|snm|vrb|bcf|run.xml|acn|acr|alg|glg|glo|gls|idx|ilg|ind|nlo|nls|xdy|glsdefs|tps|tcp|lot|xwm|synctex.gz|fls|fdb_latexmk|auxlock|dpth|md5|pdf):source-files' '*:all-files'
+zstyle ':completion:*:*:(rifle):*' file-patterns '^*.(log|brf|xdv|aux|bbl|blg|lof|log|toc|out|nav|snm|vrb|bcf|run.xml|acn|acr|alg|glg|glo|gls|idx|ilg|ind|nlo|nls|xdy|glsdefs|tps|tcp|lot|xwm|synctex.gz|fls|fdb_latexmk|auxlock|dpth|md5):source-files' '*:all-files'
 
 
 # history

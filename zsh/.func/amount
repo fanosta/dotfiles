@@ -1,0 +1,16 @@
+#!/usr/bin/zsh
+
+if [[ ! -f "$1" ]]; then
+  echo "file not found: $1" >&2
+else
+  archive="$(readlink -f "$1")"
+  name="${1:r:r:t}"
+  mountpoint="/tmp/$name"
+  mkdir -p "$mountpoint"
+
+
+  # archivemount -o readonly "$1" "$mountpoint"
+  # ratarmount "$1" "$mountpoint"
+  pushd "$mountpoint"
+  tar -xvf "$archive"
+fi

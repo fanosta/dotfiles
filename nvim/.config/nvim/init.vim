@@ -81,7 +81,7 @@ Plug 'vale1410/vim-minizinc'
 Plug 'madox2/vim-ai'
 "
 " Plug 'inkarkat/argtextobj.vim'
-" Plug 'gaving/vim-textobj-argument'
+Plug 'gaving/vim-textobj-argument'
 "
 " Plug 'Valloric/YouCompleteMe', { 'do': './install.py --clang-completer' }
 " Plug 'glacambre/firenvim', { 'do': { _ -> firenvim#install(0) } }
@@ -238,8 +238,8 @@ set smartcase
 " vimtex
 let g:tex_flavor = 'latex'
 
-" let g:latex_view_general_viewer = 'zathura'
-" let g:vimtex_view_method = "zathura"
+let g:latex_view_general_viewer = 'zathura'
+let g:vimtex_view_method = "zathura"
 
 let g:vimtex_compiler_progname = 'nvr' " neovim support
 "let g:vimtex_compiler_latexmk = {'callback' : 0}
@@ -298,6 +298,8 @@ nmap <C-b> :TagbarToggle<CR>
 autocmd FileType zinc setlocal commentstring=%\ %s
 autocmd FileType cpp setlocal commentstring=// %s
 
+" zinc highlight overlong
+
 " cycle through tabs using H/L
 nnoremap H gT
 nnoremap L gt
@@ -327,7 +329,7 @@ let g:workspace_undodir = stdpath("data") . '/undodir/'
 
 " ignore most latex files for autocomplete
 set wildignore+=*.pdf,*.o,*.o.d,*.obj,*.jpg,*.png
-set wildignore+=*.aux,*.bbl,*.blg,*.lof,*.toc,*.out,*.nav,*.snm,*.vrb,*.bcf,*.run.xml,*.acn,*.acr,*.alg,*.glg,*.glo,*.gls,*.idx,*.ilg,*.ind,*.nlo,*.nls,*.xdy,*.glsdefs,*.tps,*.tcp,*.lot,*.xwm,*.synctex.gz,*.fls,*.fdb_latexmk,*.auxlock,*.dpth,*.md5,*.pdf
+set wildignore+=*.aux,*.brf,*.xdv,*.bbl,*.blg,*.lof,*.toc,*.out,*.nav,*.snm,*.vrb,*.bcf,*.run.xml,*.acn,*.acr,*.alg,*.glg,*.glo,*.gls,*.idx,*.ilg,*.ind,*.nlo,*.nls,*.xdy,*.glsdefs,*.tps,*.tcp,*.lot,*.xwm,*.synctex.gz,*.fls,*.fdb_latexmk,*.auxlock,*.dpth,*.md5,*.pdf
 set wildignore+=*.pdfpc,*.gnuplot,*.table
 set suffixes+=*.bib,*.log, " autocomplete log files but only at the bottom
 
