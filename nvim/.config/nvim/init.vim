@@ -242,6 +242,11 @@ let g:latex_view_general_viewer = 'zathura'
 let g:vimtex_view_method = "zathura"
 
 let g:vimtex_compiler_progname = 'nvr' " neovim support
+
+" quick fixes
+let g:vimtex_quickfix_open_on_warning = 0
+
+
 "let g:vimtex_compiler_latexmk = {'callback' : 0}
 "let g:vimtex_fold_enabled = 1
 "let g:vimtex_fold_manual = 1
@@ -296,7 +301,7 @@ nmap <C-b> :TagbarToggle<CR>
 
 " vim commentary
 autocmd FileType zinc setlocal commentstring=%\ %s
-autocmd FileType cpp setlocal commentstring=// %s
+autocmd FileType cpp setlocal commentstring=//\ %s
 
 " zinc highlight overlong
 
@@ -316,6 +321,19 @@ nnoremap <A-9> 9gt
 nnoremap <silent> <A-0> :tablast<CR>
 
 map Y y$
+
+" vim ai
+" custom command that provides a code review for selected code block
+function! CodeReviewFn(range) range
+  let l:prompt = "programming syntax is " . &filetype . ", review the code below"
+  let l:config = {
+  \  "options": {
+  \    "initial_prompt": ">>> system\nyou are a clean code expert",
+  \  },
+  \}
+  '<,'>call vim_ai#AIChatRun(a:range, l:config, l:prompt)
+endfunction
+command! -range CodeReview <line1>,<line2>call CodeReviewFn(<range>)
 
 " easier terminal escape
 tnoremap <Esc> <C-\><C-n>
