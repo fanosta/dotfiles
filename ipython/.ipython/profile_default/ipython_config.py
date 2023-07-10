@@ -1,5 +1,10 @@
 # Configuration file for ipython.
 
+# make tracebacks more readable
+from IPython.core.ultratb import VerboseTB
+VerboseTB._tb_highlight = "bg:ansired"
+
+
 #------------------------------------------------------------------------------
 # InteractiveShellApp(Configurable) configuration
 #------------------------------------------------------------------------------
