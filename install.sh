@@ -19,7 +19,7 @@ if grep -qi debian  /etc/os-release; then
   fi
 fi
 
-stow --restow "$@"
+stow --ignore='^post_install$' --restow "$@"
 
 for part in "$@"; do
   if [[ -f "$part/post_install" ]]; then
