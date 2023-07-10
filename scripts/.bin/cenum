@@ -24,7 +24,7 @@ echo '#include <limits.h>' >> $f
 echo '#include <float.h>' >> $f
 echo '#include <sys/syscall.h>' >> $f
 echo '#include <elf.h>' >> $f
-echo 'int main() { printf("%1$d (0x%1$lx)\n", '"$1"'); }' >> "$f"
+echo 'int main() { printf("%1$llu (0x%1$llx)\n", (long long unsigned int)('"$1"')); }' >> "$f"
 
 # compile and execute
 gcc "$f" -o "$f.elf" && "$f.elf"
