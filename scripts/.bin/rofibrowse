@@ -9,4 +9,4 @@ fi
 
 cd "$1"
 shift
-find . -type f | grep '\.pdf$' | sort | sed 's#^\./##' | rofi -dmenu "$@" | xargs rifle
+find . | grep '\.pdf$' | sort | sed 's#^\./##' | rofi -dmenu "$@" | xargs rifle
