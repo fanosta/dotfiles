@@ -1,4 +1,9 @@
 #!/bin/sh
+#
+# Get the directory containing the current script
+# and remove it from $PATH
+dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+export PATH=$(echo $PATH | sed -e "s#:$dir##g" -e "s#$dir:##g" -e "s#$dir##g")
 
 _FZF_DEFAULT_COMMAND='rg --files --hidden --follow -g "!{.git,node_modules}/*" 2> /dev/null'
 _FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
@@ -6,4 +11,4 @@ _FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 #export FZF_DEFAULT_COMMAND="${FZF_DEFAULT_COMMAND+$_FZF_DEFAULT_COMMAND}"
 #export FZF_CTRL_T_COMMAND="${FZF_CTRL_T_COMMAND+$_FZF_CTRL_T_COMMAND}"
 
-exec /usr/bin/fzf "$@"
+fzf "$@"
