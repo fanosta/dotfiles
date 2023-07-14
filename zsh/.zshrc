@@ -117,3 +117,6 @@ bindkey '^Z' fancy-ctrl-z
 # reload ~/.zshrc on SIGURG
 trap 'echo reloading \~/.zshrc; source "${ZDOTDIR:-$HOME}/.zshrc"' SIGURG
 alias srcall='killall -URG zsh'
+
+# iterm 2 integration
+test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
