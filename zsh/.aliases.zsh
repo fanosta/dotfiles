@@ -32,7 +32,8 @@ alias -g NE='2>/dev/null'
 
 # reduce danger
 alias rm='rm -i'
-alias cp='cp -i --reflink=auto'
+# alias cp='cp -i --reflink=auto'
+alias cp='cp -i'
 alias mv='mv -i'
 
 # personal aliases
