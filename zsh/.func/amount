@@ -1,16 +1,32 @@
 #!/usr/bin/zsh
 
-if [[ ! -f "$1" ]]; then
-  echo "file not found: $1" >&2
+file="$1"
+
+if [[ ! -f "$file" ]]; then
+  if [[ -f "$HOME/tu/papers/$file.tar.zst" ]]; then
+    file="$HOME/tu/papers/$file.tar.zst"
+  elif [[ -f "$HOME/tu/phd/$file.tar.zst" ]]; then
+    file="$HOME/tu/phd/$file.tar.zst"
+  elif [[ -f "$HOME/tu/msc/$file.tar.zst" ]]; then
+    file="$HOME/tu/msc/$file.tar.zst"
+  elif [[ -f "$HOME/tu/bsc/$file.tar.zst" ]]; then
+    file="$HOME/tu/bsc/$file.tar.zst"
+  fi
+fi
+
+echo "file: $file"
+
+if [[ ! -f "$file" ]]; then
+  echo "file not found: $file" >&2
 else
-  archive="$(readlink -f "$1")"
+  archive="$(readlink -f "$file")"
   name="${1:r:r:t}"
   mountpoint="/tmp/$name"
   mkdir -p "$mountpoint"
 
 
-  # archivemount -o readonly "$1" "$mountpoint"
-  # ratarmount "$1" "$mountpoint"
+  # archivemount -o readonly "$file" "$mountpoint"
+  # ratarmount "$file" "$mountpoint"
   pushd "$mountpoint"
   tar -xvf "$archive"
 fi

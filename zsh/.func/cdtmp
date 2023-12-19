@@ -1,6 +1,6 @@
 #!/bin/zsh
 
-if [[ $# -gt 2 ]]; then
+if [[ $# -ge 2 ]]; then
   echo "usage: cdtmp [prefix]" >&2
   return 1
 fi
