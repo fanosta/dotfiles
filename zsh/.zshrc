@@ -120,4 +120,6 @@ trap 'echo reloading \~/.zshrc; source "${ZDOTDIR:-$HOME}/.zshrc"' SIGURG
 alias srcall='killall -URG zsh'
 
 # iterm 2 integration
-test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+if [[ -e "${HOME}/.iterm2_shell_integration.zsh" ]] then
+  source "${HOME}/.iterm2_shell_integration.zsh"
+fi
