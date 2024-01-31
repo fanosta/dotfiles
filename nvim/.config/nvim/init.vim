@@ -3,6 +3,7 @@ set modeline
 set modelines=5
 " line wrap
 set wrap linebreak
+set tabstop=4
 
 set nocompatible
 
@@ -97,7 +98,12 @@ Plug 'sonph/onehalf', {'rtp': 'vim/'}
 Plug 'mechatroner/rainbow_csv'
 Plug 'ctrlpvim/ctrlp.vim'
 Plug 'jiangmiao/auto-pairs'
+Plug 'neovim/nvim-lspconfig'
+Plug 'github/copilot.vim'
+Plug 'kyoh86/vim-jsonl'
 call plug#end()
+
+lua require'lspconfig'.pyright.setup{}
 
 " COQ setup
 " local lsp = require "lspconfig"
