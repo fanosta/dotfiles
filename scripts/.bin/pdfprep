@@ -1,0 +1,88 @@
+#!/usr/bin/env python3
+"""
+Process a pdf file for printing as a booklet.
+"""
+import os
+import subprocess as sp
+import argparse
+import tempfile
+from pathlib import Path
+
+
+STAPLE_TEX = r"""
+\documentclass[a4paper,landscape]{article}
+\usepackage{tikz}
+\pagestyle{empty}
+
+\begin{document}
+\begin{tikzpicture}[remember picture,overlay]
+  \draw[gray] (current page.north) ++ (0, -20mm) -- ++(0, -10.6mm);
+  \draw[gray] (current page.south) ++ (0, 20mm) -- ++(0, 10.6mm);
+\end{tikzpicture}
+\end{document}
+"""
+
+def get_staple_pdf() -> Path:
+    # Compile staple.pdf if necessary
+    staple_tex_file = Path("staple.tex")
+    staple_pdf_file = Path("/tmp/staple.pdf")
+
+    if not staple_pdf_file.exists():
+        with staple_tex_file.open('w') as tex_file:
+            tex_file.write(STAPLE_TEX)
+        print("-> compiling staple marks")
+        sp.check_call(["pdflatex", staple_tex_file], stdout=sp.DEVNULL)
+        sp.check_call(["pdflatex", staple_tex_file], stdout=sp.DEVNULL)
+        Path('staple.pdf').rename(staple_pdf_file)
+
+    return staple_pdf_file
+
+
+def main(input_file: Path, pages: str, margin: str, bounding_box: str, no_bounding_box: str, output_file: Path|None, clip: bool, staple: bool) -> None:
+    input_file = input_file.expanduser().resolve()
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmpdir = Path(tmpdir)
+        # Change to tmpdir
+        os.chdir(tmpdir)
+
+        xupped_file = tmpdir / f"{input_file.stem}_xup.pdf"
+        stapled_file =tmpdir / f"{input_file.stem}_stapled.pdf"
+        output_file = output_file or input_file.with_stem(f"{input_file.stem}_print")
+
+        # Convert to booklet format
+        pdfxup_args = ["bash", "pdfxup",
+                       "--booklet", "--paper", "a4", "-o", xupped_file,
+                       "-p", pages,
+                       "-m", margin,
+                       "-c" if clip else "-nc",
+                       "--bb", bounding_box,
+                       "--nobb", no_bounding_box,
+                       input_file]
+        sp.check_call(pdfxup_args)
+
+        if not staple:
+            xupped_file.rename(output_file)
+            return
+
+        staple_pdf_file = get_staple_pdf()
+    
+        print("-> adding staple marks")
+        sp.check_call(["pdftk", xupped_file, "stamp", staple_pdf_file, "output", stapled_file])
+        sp.check_call(["pdftk", f"A={stapled_file}", f"B={xupped_file}", "cat", "A1", "B2-end", "output", output_file])
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("input_file", type=Path, help="input PDF file")
+    parser.add_argument("-bb", "--bounding-box", default="2-5", help="pages to use for computing bounding box")
+    parser.add_argument("-nobb", "--no-bounding-box", default="", help="pages to omit when computing bounding box")
+    parser.add_argument("-m", "--margin", default="3mm", help="margins")
+    parser.add_argument("-p", "--pages", default="-", help="only include these pages")
+    parser.add_argument("-o", "--output-file", type=Path, default=None, help="output file, default: <input_file>_print.pdf")
+    parser.add_argument("-nc", "--no-clip", dest="clip", action="store_false", default=True, help="do not clip bounding box")
+    parser.add_argument("-ns", "--no-staple", dest="staple", action="store_false", default=True, help="do not print staple marks on first page")
+
+    args = parser.parse_args()
+
+    main(args.input_file, args.pages, args.margin, args.bounding_box, args.no_bounding_box, args.output_file, args.clip, args.staple)
