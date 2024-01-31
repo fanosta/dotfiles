@@ -7,19 +7,19 @@ if [[ $# -eq 0 ]]; then
 fi
 
 # generate temporary file
-f=$(mktemp --suffix=.c)
+f=$(mktemp)
 
-echo '#include <stdio.h>' >> $f
-echo '#include <stdlib.h>' >> $f
-echo '#include <string.h>' >> $f
-echo '#include <errno.h>' >> $f
-echo '#include <signal.h>' >> $f
-echo '#include <unistd.h>' >> $f
-echo '#include <limits.h>' >> $f
-echo '#include <float.h>' >> $f
-echo '#include <sys/syscall.h>' >> $f
-echo '#include <elf.h>' >> $f
-echo '#include <assert.h>' >> $f
+echo '#include <stdio.h>' >> "$f"
+echo '#include <stdlib.h>' >> "$f"
+echo '#include <string.h>' >> "$f"
+echo '#include <errno.h>' >> "$f"
+echo '#include <signal.h>' >> "$f"
+echo '#include <unistd.h>' >> "$f"
+echo '#include <limits.h>' >> "$f"
+echo '#include <float.h>' >> "$f"
+echo '#include <sys/syscall.h>' >> "$f"
+echo '#include <elf.h>' >> "$f"
+echo '#include <assert.h>' >> "$f"
 
 # add headers
 while [[ $# -gt 1 ]]; do
