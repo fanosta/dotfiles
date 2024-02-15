@@ -1,12 +1,18 @@
 #!/usr/bin/env python3
 """
-opens a .eml file in thunderbird for sending
+opens a .eml file in Thunderbird/Mail.app for sending
 """
 from __future__ import annotations
+
 import argparse
 import re
 import os
+import io
 import subprocess as sp
+from pathlib import Path
+import sys
+
+from typing import Literal
 
 
 def parse_headers(file: io.TextIOBase):
@@ -26,7 +32,93 @@ def parse_headers(file: io.TextIOBase):
     return headers
 
 
-def send_email(file: io.TextIOBase):
+def parse_recipients(recipients: str) -> list[tuple[str|None, str]]:
+    recipients = recipients.strip()
+    if recipients == '':
+        return []
+
+    recipients_list = re.split(r',\s*', recipients)
+    parsed = []
+    for recipient in recipients_list:
+        match = re.match(r'(.*)\s*<(.*)>', recipient)
+        if match:
+            name, email = match.groups()
+        else:
+            name = None
+            email = recipient
+        parsed.append((name, email))
+    return parsed
+
+def quote_dict(d: dict[str, str|int|bool|None]) -> str:
+    return '{' + ', '.join(f'{k}: {quote_applescript(v)}' for k, v in d.items() if v is not None) + '}'
+
+def quote_applescript(s: str|int|bool) -> str:
+    if isinstance(s, bool):
+        return 'true' if s else 'false'
+    if isinstance(s, int):
+        return str(s)
+
+    return '"' + (s
+        .replace('\\', r'\\')
+        .replace('"', r'\"')
+        .replace('\n', r'\n')
+        .replace('\r', r'\r')
+        .replace('\t', r'\t')
+    ) + '"'
+
+
+def recipeint_as_applescript(kind: Literal["to", "cc", "bcc"], name: str|None, email: str) -> str:
+    recipient_obj = {'name': name, 'address': email}
+
+    return " " * 16 + f"make new to recipient at end of {kind} recipients with properties {quote_dict(recipient_obj)}"
+
+def attachment_as_applescript(file_name: Path) -> str:
+    properties: dict[str, str|int|bool|None] = { 'file name': str(file_name.absolute()) }
+    return " " * 16 + f"make new attachment with properties {quote_dict(properties)} at after the last paragraph"
+
+def send_email_mailapp(file: io.TextIOBase):
+    headers = parse_headers(file)
+    body = file.read().lstrip('\n')
+    if body.endswith('\n'):
+        body = body[:-1]
+
+    to = parse_recipients(headers.pop('To', ''))
+    cc = parse_recipients(headers.pop('Cc', ''))
+    bcc = parse_recipients(headers.pop('Bcc', ''))
+    subject = headers.pop('Subject', None)
+    from_ = headers.pop('From', None)
+    attachments = re.split(r',\s*', headers.pop('Attachment', ''))
+    attachments = [Path(attachment) for attachment in attachments if attachment != '']
+
+    for header, _ in headers.items():
+        print(f'[WARN] unrecognized header: "{header}"')
+
+    tell_msg_str = '\n'.join(
+        [recipeint_as_applescript('to', name, email) for name, email in to]
+        + [recipeint_as_applescript('cc', name, email) for name, email in cc]
+        + [recipeint_as_applescript('bcc', name, email) for name, email in bcc]
+        + [attachment_as_applescript(attachment) for attachment in attachments]
+    )
+
+    properties = {
+        'visible': True,
+        'subject': subject,
+        'content': body,
+        'sender': from_,
+    }
+
+    applescript = f'''
+        tell application "Mail"
+            set new_msg to make new outgoing message with properties {quote_dict(properties)}
+            tell new_msg
+{tell_msg_str}
+            end tell
+        end tell
+    '''
+    sp.run(['osascript', '-e', applescript], capture_output=True)
+
+
+def send_email_thunderbird(file: io.TextIOBase):
     headers = parse_headers(file)
     body = file.read()
     if body.endswith('\n'):
@@ -63,5 +155,10 @@ if __name__ == '__main__':
         if not dirname.startswith('/'):
             dirname = './' + dirname
         os.chdir(dirname)
-        send_email(file)
+
+        if sys.platform == 'darwin':
+            send_email_mailapp(file)
+        else:
+            send_email_thunderbird(file)
+
         os.chdir(cwd)
