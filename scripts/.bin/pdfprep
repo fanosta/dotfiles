@@ -4,6 +4,7 @@ Process a pdf file for printing as a booklet.
 """
 import os
 import subprocess as sp
+import shutil
 import argparse
 import tempfile
 from pathlib import Path
@@ -38,7 +39,7 @@ def get_staple_pdf() -> Path:
     return staple_pdf_file
 
 
-def main(input_file: Path, pages: str, margin: str, bounding_box: str, no_bounding_box: str, output_file: Path|None, clip: bool, staple: bool) -> None:
+def main(input_file: Path, pages: str, margin: str, bound_box_vals: tuple[int, int, int, int]|None, bounding_box: str, no_bounding_box: str, output_file: Path|None, clip: bool, staple: bool) -> int|None:
     input_file = input_file.expanduser().resolve()
 
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -49,28 +50,53 @@ def main(input_file: Path, pages: str, margin: str, bounding_box: str, no_boundi
         xupped_file = tmpdir / f"{input_file.stem}_xup.pdf"
         stapled_file =tmpdir / f"{input_file.stem}_stapled.pdf"
         output_file = output_file or input_file.with_stem(f"{input_file.stem}_print")
+        bb_args = ["-s"] + list(map(str, bound_box_vals)) if bound_box_vals else []
+
+        pdfxup = shutil.which("pdfxup")
+        pdftk = shutil.which("pdftk")
+
+        if not pdfxup:
+            print("pdfxup not found, for Debian/Ubuntu install texlive-extra-utils package")
+            return 1
+
+        if not pdftk and staple:
+            print("pdftk not found, for Debian/Ubuntu install pdftk package")
+            return 1
 
         # Convert to booklet format
-        pdfxup_args = ["bash", "pdfxup",
+        pdfxup_args = ["bash", pdfxup,
                        "--booklet", "--paper", "a4", "-o", xupped_file,
+                       *bb_args,
                        "-p", pages,
                        "-m", margin,
                        "-c" if clip else "-nc",
                        "--bb", bounding_box,
                        "--nobb", no_bounding_box,
                        input_file]
-        sp.check_call(pdfxup_args)
 
-        if not staple:
-            xupped_file.rename(output_file)
-            return
+        try:
+            sp.check_call(pdfxup_args)
 
-        staple_pdf_file = get_staple_pdf()
-    
-        print("-> adding staple marks")
-        sp.check_call(["pdftk", xupped_file, "stamp", staple_pdf_file, "output", stapled_file])
-        sp.check_call(["pdftk", f"A={stapled_file}", f"B={xupped_file}", "cat", "A1", "B2-end", "output", output_file])
+            if not staple:
+                xupped_file.rename(output_file)
+                return
 
+            staple_pdf_file = get_staple_pdf()
+
+            print("-> adding staple marks")
+            sp.check_call([pdftk, xupped_file, "stamp", staple_pdf_file, "output", stapled_file])
+            sp.check_call([pdftk, f"A={stapled_file}", f"B={xupped_file}", "cat", "A1", "B2-end", "output", output_file])
+        except sp.CalledProcessError as e:
+            return e.returncode
+
+def parse_bounding_box(s: str) -> tuple[int, int, int, int]:
+    try:
+        tup = tuple(map(int, s.split(",")))
+    except ValueError:
+        raise argparse.ArgumentTypeError(f"Invalid bounding box: {s} - expected 4 integers separated by commas")
+    if len(tup) != 4:
+        raise argparse.ArgumentTypeError(f"Invalid bounding box: {s} - expected 4 integers separated by commas")
+    return tup
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
@@ -83,6 +109,12 @@ if __name__ == "__main__":
     parser.add_argument("-nc", "--no-clip", dest="clip", action="store_false", default=True, help="do not clip bounding box")
     parser.add_argument("-ns", "--no-staple", dest="staple", action="store_false", default=True, help="do not print staple marks on first page")
 
+    # add mutually exclusive group --tosc and -s to specify bounding box
+    bounding_box = parser.add_mutually_exclusive_group()
+    bounding_box.add_argument("-s", dest="bounding_box_vals", type=parse_bounding_box, help="specify bounding box")
+    bounding_box.add_argument("--tosc", dest="bounding_box_vals", action="store_const", const=(103, 103, 495, 740))
+
     args = parser.parse_args()
 
-    main(args.input_file, args.pages, args.margin, args.bounding_box, args.no_bounding_box, args.output_file, args.clip, args.staple)
+    ret = main(args.input_file, args.pages, args.margin, args.bounding_box_vals, args.bounding_box, args.no_bounding_box, args.output_file, args.clip, args.staple)
+    raise SystemExit(ret)
