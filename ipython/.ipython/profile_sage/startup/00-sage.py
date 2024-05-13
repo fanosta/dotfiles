@@ -65,6 +65,61 @@ def differential_spectrum(sbox: SBox):
     ddt = np.array(sbox.difference_distribution_table())
     return  Counter(np.sort(ddt.ravel())[::-1])
 
+def _as_vec_gf2(x: int, bits: int) -> vector:
+    v = vector(GF(2), bits)
+    for i in range(bits):
+        v[i] = (x >> i) & 1
+    return v
+
+
+def _linear_span(elements: set[int], bits: int) -> tuple[vector, VectorSpace]:
+    iterator = iter(elements)
+
+    offset = _as_vec_gf2(next(iterator), bits)
+
+    vectors = []
+    for x in iterator:
+        vectors.append(_as_vec_gf2(x, bits) + offset)
+
+    base_space = VectorSpace(GF(2), bits)
+    return offset, base_space.subspace(vectors)
+
+
+def _is_affine_space(solution_set: set[int], bits: int) -> bool:
+    _, subspace = _linear_span(solution_set, bits)
+    return len(subspace) == len(solution_set)
+
+
+def is_planar(sbox: SBox) -> bool:
+    if hasattr(sbox, '_planar'):
+        return sbox._planar
+
+    if sbox.differential_uniformity() <= 4:
+        return True
+
+    if sbox.max_degree() <= 2 and sbox.inverse().max_degree() <= 2:
+        return True
+
+    sbox_xddt = xddt(sbox).ravel()
+    sbox_yddt = yddt(sbox).ravel()
+
+    sbox_xddt = sbox_xddt[sbox_xddt != set()]
+    sbox_yddt = sbox_yddt[sbox_yddt != set()]
+
+    for input_set in sbox_xddt.ravel():
+        if not _is_affine_space(input_set, sbox.input_size()):
+            setattr(sbox, '_planar', False)
+            return False
+
+    for output_set in sbox_yddt.ravel():
+        if not _is_affine_space(output_set, sbox.output_size()):
+            setattr(sbox, '_planar', False)
+            return False
+
+    setattr(sbox, '_planar', True)
+    return True
+
+
 
 def print_bitmap(bitmap: np.array, displ = lambda x : '# ' if x else '  '):
     if len(bitmap.shape) != 2:
