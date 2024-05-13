@@ -14,24 +14,6 @@ set mouse=a
 set number
 set relativenumber
 set clipboard=unnamed
-" wayland clipboard
-" clipboard sync
-
-if !empty($WAYLAND_DISPLAY)
-  let g:clipboard = {
-  \   'name': 'wlClipboard',
-  \   'copy': {
-  \       '+': 'wl-copy',
-  \       '*': 'wl-copy -p',
-  \   },
-  \   'paste': {
-  \       '+': 'wl-paste -n',
-  \       '*': 'wl-paste -p -n',
-  \   },
-  \   'cache_enabled': 1,
-  \}
-endif
-
 
 set cursorline
 set expandtab
@@ -102,6 +84,14 @@ Plug 'neovim/nvim-lspconfig'
 Plug 'github/copilot.vim'
 Plug 'kyoh86/vim-jsonl'
 call plug#end()
+
+" copilot setup
+let g:copilot_filetypes = {
+    \ 'tex': v:false,
+    \ 'text': v:false,
+    \ 'markdown': v:false,
+\ }
+
 
 lua require'lspconfig'.pyright.setup{}
 
