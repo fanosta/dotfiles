@@ -13,13 +13,22 @@ activate_venv() {
     return 1
 }
 
+create_venv() {
+    python3 -m venv venv/ &&
+    source venv/bin/activate
+}
+
 # Find and activate venv if exists
 if activate_venv "$(pwd)"; then
     echo "Activated existing virtual environment."
 else
-    echo "Virtual environment not found. Creating a new one..."
-    python3 -m venv venv/
-    source venv/bin/activate
-    echo "New virtual environment created and activated."
+    echo "Virtual environment not found."
+    if read -q "choice?Do you want to create a new one? [y/N]: "; then
+        echo;
+        create_venv &&
+        echo "New virtual environment created and activated."
+    else
+        echo;
+    fi
 fi
 
