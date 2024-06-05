@@ -89,16 +89,23 @@ def _is_affine_space(solution_set: set[int], bits: int) -> bool:
     _, subspace = _linear_span(solution_set, bits)
     return len(subspace) == len(solution_set)
 
-
 def is_planar(sbox: SBox) -> bool:
     if hasattr(sbox, '_planar'):
         return sbox._planar
 
     if sbox.differential_uniformity() <= 4:
+        setattr(sbox, '_planar', False)
         return True
 
     if sbox.max_degree() <= 2 and sbox.inverse().max_degree() <= 2:
+        setattr(sbox, '_planar', False)
         return True
+
+    # ddt entries must be 0 or power of 2
+    ddt = np.array(sbox.difference_distribution_table())
+    if not np.all(ddt & (ddt - 1) == 0):
+        setattr(sbox, '_planar', False)
+        return False
 
     sbox_xddt = xddt(sbox).ravel()
     sbox_yddt = yddt(sbox).ravel()
@@ -119,7 +126,27 @@ def is_planar(sbox: SBox) -> bool:
     setattr(sbox, '_planar', True)
     return True
 
+def undisturbed_bits(s):
+    in_bits = s.input_size()
+    out_bits = s.output_size()
 
+    ddt = np.array(s.difference_distribution_table())
+
+    for in_delta in range(1 << in_bits):
+        out_deltas, = np.where(ddt[in_delta] > 0)
+        always_zeros = np.bitwise_and.reduce(~out_deltas)
+        always_ones = np.bitwise_and.reduce(out_deltas)
+
+        out_delta = ''
+        for i in range(out_bits):
+            if always_zeros & (1 << i):
+                out_delta = '0' + out_delta
+            elif always_ones & (1 << i):
+                out_delta = '1' + out_delta
+            else:
+                out_delta = '-' + out_delta
+
+        print(f'{in_delta:0{in_bits}b} -> {out_delta}')
 
 def print_bitmap(bitmap: np.array, displ = lambda x : '# ' if x else '  '):
     if len(bitmap.shape) != 2:
