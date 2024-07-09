@@ -72,7 +72,15 @@ def _as_vec_gf2(x: int, bits: int) -> vector:
     return v
 
 
-def _linear_span(elements: set[int], bits: int) -> tuple[vector, VectorSpace]:
+def affine_hull(elements: set[int], bits: int) -> VectorSpace:
+    for x in elements:
+        vectors.append(_as_vec_gf2(x, bits))
+
+    base_space = VectorSpace(GF(2), bits)
+    return base_space.subspace(vectors)
+
+
+def affine_hull(elements: set[int], bits: int) -> tuple[vector, VectorSpace]:
     iterator = iter(elements)
 
     offset = _as_vec_gf2(next(iterator), bits)
@@ -85,8 +93,8 @@ def _linear_span(elements: set[int], bits: int) -> tuple[vector, VectorSpace]:
     return offset, base_space.subspace(vectors)
 
 
-def _is_affine_space(solution_set: set[int], bits: int) -> bool:
-    _, subspace = _linear_span(solution_set, bits)
+def is_affine_space(solution_set: set[int], bits: int) -> bool:
+    _, subspace = affine_hull(solution_set, bits)
     return len(subspace) == len(solution_set)
 
 def is_planar(sbox: SBox) -> bool:
@@ -114,12 +122,12 @@ def is_planar(sbox: SBox) -> bool:
     sbox_yddt = sbox_yddt[sbox_yddt != set()]
 
     for input_set in sbox_xddt.ravel():
-        if not _is_affine_space(input_set, sbox.input_size()):
+        if not is_affine_space(input_set, sbox.input_size()):
             setattr(sbox, '_planar', False)
             return False
 
     for output_set in sbox_yddt.ravel():
-        if not _is_affine_space(output_set, sbox.output_size()):
+        if not is_affine_space(output_set, sbox.output_size()):
             setattr(sbox, '_planar', False)
             return False
 
@@ -182,6 +190,8 @@ sboxes.SPEEDY = SBox([8, 0, 9, 3, 56, 16, 41, 19, 12, 13, 4, 7, 48, 1, 32, 35,
                       17, 37, 53, 34, 38, 42, 46, 58, 30, 40, 60, 43, 59, 47,
                       63, 57, 25, 45, 61])
 sboxes.WARP = SBox(int(x, 16) for x in "cad3ebf789150246")
+sboxes.LED = SBox(int(x, 16) for x in "c56b90ad3ef84712")
+sboxes.RoadRunneR = SBox(int(x, 16) for x in "086d5f7c4e2391ba")
 
 # SBox.xddt = xddt
 # SBox.yddt = yddt
