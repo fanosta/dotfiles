@@ -32,8 +32,22 @@ def get_staple_pdf() -> Path:
         with staple_tex_file.open('w') as tex_file:
             tex_file.write(STAPLE_TEX)
         print("-> compiling staple marks")
-        sp.check_call(["pdflatex", staple_tex_file], stdout=sp.DEVNULL)
-        sp.check_call(["pdflatex", staple_tex_file], stdout=sp.DEVNULL)
+        try:
+            sp.check_call(["pdflatex", "-halt-on-error", "-interaction=nonstopmode", staple_tex_file], stdin=sp.DEVNULL, stdout=sp.DEVNULL)
+            sp.check_call(["pdflatex", "-halt-on-error", "-interaction=nonstopmode", staple_tex_file], stdin=sp.DEVNULL, stdout=sp.DEVNULL)
+        except sp.CalledProcessError as e:
+            print("Error compiling staple marks")
+            print("----------------------------")
+            with staple_tex_file.with_suffix(".log").open() as log_file:
+                error = log_file.read()
+                if "LaTeX Error: File `tikz.sty' not found." in error:
+                    print("LaTeX Error: File `tikz.sty' not found.")
+                    print()
+                    print("For Debian/Ubuntu, install with\nsudo apt install texlive-pictures")
+
+                print(log_file.read())
+            raise e
+
         Path('staple.pdf').rename(staple_pdf_file)
 
     return staple_pdf_file
@@ -52,15 +66,26 @@ def main(input_file: Path, pages: str, margin: str, bound_box_vals: tuple[int, i
         output_file = output_file or input_file.with_stem(f"{input_file.stem}_print")
         bb_args = ["-s"] + list(map(str, bound_box_vals)) if bound_box_vals else []
 
+        pdflatex = shutil.which("pdflatex")
         pdfxup = shutil.which("pdfxup")
         pdftk = shutil.which("pdftk")
-
+        
+        missing_cmds = []
+        missing_packages = []
+        if not pdflatex:
+            missing_cmds.append("pdflatex")
+            missing_packages += ["texlive-latex-base", "texlive-pictures"]
         if not pdfxup:
-            print("pdfxup not found, for Debian/Ubuntu install texlive-extra-utils package")
-            return 1
-
+            missing_cmds.append("pdfxup")
+            missing_packages.append("texlive-extra-utils")
         if not pdftk and staple:
-            print("pdftk not found, for Debian/Ubuntu install pdftk package")
+            missing_cmds.append("pdftk")
+            missing_packages.append("pdftk")
+
+        if missing_cmds:
+            print("Missing commands: " + ", ".join(missing_cmds))
+            print("For Ubuntu/Debian, install with:")
+            print(f"sudo apt install {' '.join(missing_packages)}")
             return 1
 
         # Convert to booklet format
@@ -75,7 +100,7 @@ def main(input_file: Path, pages: str, margin: str, bound_box_vals: tuple[int, i
                        input_file]
 
         try:
-            sp.check_call(pdfxup_args)
+            sp.check_call(pdfxup_args, stdin=sp.DEVNULL)
 
             if not staple:
                 xupped_file.rename(output_file)
@@ -84,8 +109,9 @@ def main(input_file: Path, pages: str, margin: str, bound_box_vals: tuple[int, i
             staple_pdf_file = get_staple_pdf()
 
             print("-> adding staple marks")
-            sp.check_call([pdftk, xupped_file, "stamp", staple_pdf_file, "output", stapled_file])
-            sp.check_call([pdftk, f"A={stapled_file}", f"B={xupped_file}", "cat", "A1", "B2-end", "output", output_file])
+            assert pdftk is not None
+            sp.check_call([pdftk, xupped_file, "stamp", staple_pdf_file, "output", stapled_file], stdin=sp.DEVNULL)
+            sp.check_call([pdftk, f"A={stapled_file}", f"B={xupped_file}", "cat", "A1", "B2-end", "output", output_file], stdin=sp.DEVNULL)
         except sp.CalledProcessError as e:
             return e.returncode
 
