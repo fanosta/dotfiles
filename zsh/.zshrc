@@ -132,8 +132,20 @@ if which virtualenvwrapper.sh > /dev/null; then
     if [[ -f .venv ]]; then
       local _VENV="$(cat .venv)"
       if [[ -z "$VIRTUAL_ENV_PROMPT" ]] || [[ "$VIRTUAL_ENV_PROMPT" != "$_VENV" ]]; then
-        workon "$_VENV"
+        workon --no-cd "$_VENV"
+
+        if [[ -f "$VIRTUAL_ENV/$VIRTUALENVWRAPPER_PROJECT_FILENAME" ]]; then
+          VIRTUALENV_DEACTIVE_ON_LEAVE="$(cat $VIRTUAL_ENV/$VIRTUALENVWRAPPER_PROJECT_FILENAME)"
+        else
+          VIRTUALENV_DEACTIVE_ON_LEAVE="$PWD"
+        fi
       fi
+    fi
+
+    # deactivate if not in a (sub)directory of VIRTUALENV_AUTO_DISABLE
+    if [[ -n "$VIRTUALENV_DEACTIVE_ON_LEAVE" ]] && [[ "$PWD" != "$VIRTUALENV_DEACTIVE_ON_LEAVE"* ]]; then
+      deactivate
+      unset VIRTUALENV_DEACTIVE_ON_LEAVE
     fi
   }
 
