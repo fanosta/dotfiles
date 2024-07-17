@@ -5,7 +5,9 @@ activate_venv() {
     local dir="$1"
     while [[ "$dir" != "/" ]]; do
         if [[ -d "$dir/venv" ]]; then
-            source "$dir/venv/bin/activate"
+            source "$dir/venv/bin/activate" \
+              && echo "Activated existing virtual environment." \
+              || echo "Failed to activate virtual environment."
             return 0
         fi
         dir="$(dirname "$dir")"
@@ -20,7 +22,6 @@ create_venv() {
 
 # Find and activate venv if exists
 if activate_venv "$(pwd)"; then
-    echo "Activated existing virtual environment."
 else
     echo "Virtual environment not found."
     if read -q "choice?Do you want to create a new one? [y/N]: "; then
