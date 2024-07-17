@@ -123,3 +123,21 @@ alias srcall='killall -URG zsh'
 if [[ -e "${HOME}/.iterm2_shell_integration.zsh" ]] then
   source "${HOME}/.iterm2_shell_integration.zsh"
 fi
+
+# virtualenvs
+if which virtualenvwrapper.sh > /dev/null; then
+  source $(which virtualenvwrapper.sh)
+
+  function chpwd() {
+    if [[ -f .venv ]]; then
+      local _VENV="$(cat .venv)"
+      if [[ -z "$VIRTUAL_ENV_PROMPT" ]] || [[ "$VIRTUAL_ENV_PROMPT" != "$_VENV" ]]; then
+        workon "$_VENV"
+      fi
+    fi
+  }
+
+  chpwd
+fi
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
