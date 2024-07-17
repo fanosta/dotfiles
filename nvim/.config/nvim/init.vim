@@ -89,7 +89,9 @@ call plug#end()
 let g:copilot_filetypes = {
     \ 'tex': v:false,
     \ 'text': v:false,
+    \ 'hotcrp_review': v:false,
     \ 'markdown': v:false,
+    \ 'mail': v:false,
 \ }
 
 
