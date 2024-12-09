@@ -61,6 +61,22 @@ def yddt(sbox: SBox):
     setattr(sbox, '_yddt', res)
     return res
 
+def xyddt(sbox: SBox):
+    if (hasattr(sbox, '_xyddt')):
+        return sbox._xyddt
+
+    _xddt = xddt(sbox)
+    res = np.zeros_like(_xddt, dtype=object)
+
+    nrows = 1 << sbox.input_size()
+    ncols = 1 << sbox.output_size()
+    for i in range(nrows):
+        for j in range(nrows):
+            res[i, j] = {(x, sbox[x]) for x in _xddt[i, j]}
+
+    setattr(sbox, '_xyddt', res)
+    return res
+
 def differential_spectrum(sbox: SBox):
     ddt = np.array(sbox.difference_distribution_table())
     return  Counter(np.sort(ddt.ravel())[::-1])
@@ -71,8 +87,11 @@ def _as_vec_gf2(x: int, bits: int) -> vector:
         v[i] = (x >> i) & 1
     return v
 
+def _vec_gf2_as_int(v: vector) -> int:
+    return sum(int(v[i]) << i for i in range(len(v)))
 
-def affine_hull(elements: set[int], bits: int) -> VectorSpace:
+
+def linear_hull(elements: set[int], bits: int) -> VectorSpace:
     for x in elements:
         vectors.append(_as_vec_gf2(x, bits))
 
@@ -91,6 +110,14 @@ def affine_hull(elements: set[int], bits: int) -> tuple[vector, VectorSpace]:
 
     base_space = VectorSpace(GF(2), bits)
     return offset, base_space.subspace(vectors)
+
+
+def affine_hull_list(elements: list[int], bits: int) -> list[int]:
+    offset, subspace = affine_hull(set(elements), bits)
+    res = []
+    for v in subspace:
+        res.append(_vec_gf2_as_int(v + offset))
+    return res
 
 
 def is_affine_space(solution_set: set[int], bits: int) -> bool:
@@ -156,7 +183,7 @@ def undisturbed_bits(s):
 
         print(f'{in_delta:0{in_bits}b} -> {out_delta}')
 
-def print_bitmap(bitmap: np.array, displ = lambda x : '# ' if x else '  '):
+def print_bitmap(bitmap: np.ndarray, displ = lambda x : '# ' if x else '  '):
     if len(bitmap.shape) != 2:
         raise ValueError('bitmap must be 2d array')
 
@@ -165,7 +192,7 @@ def print_bitmap(bitmap: np.array, displ = lambda x : '# ' if x else '  '):
             print(displ(bitmap[row, col]), end='')
         print()
 
-def render_bitmap(bitmap: np.array):
+def render_bitmap(bitmap: np.ndarray):
     if len(bitmap.shape) != 2:
         raise ValueError('bitmap must be 2d array')
 
@@ -173,7 +200,7 @@ def render_bitmap(bitmap: np.array):
     img.show()
     return img
 
-def render_bitmap_log(bitmap: np.array, factor: float):
+def render_bitmap_log(bitmap: np.ndarray, factor: float):
     p = bitmap / np.max(bitmap)
     imgbuf = np.zeros_like(bitmap, dtype=np.int32)
     imgbuf[p > 0] = 255 + factor * np.log2(p[p > 0])
@@ -192,6 +219,8 @@ sboxes.SPEEDY = SBox([8, 0, 9, 3, 56, 16, 41, 19, 12, 13, 4, 7, 48, 1, 32, 35,
 sboxes.WARP = SBox(int(x, 16) for x in "cad3ebf789150246")
 sboxes.LED = SBox(int(x, 16) for x in "c56b90ad3ef84712")
 sboxes.RoadRunneR = SBox(int(x, 16) for x in "086d5f7c4e2391ba")
+sboxes.Ascon_le = sboxes.SBox(bytearray.fromhex('040f1b010b00170d1f1c021012110c1e1a1914061516180a050e09130803071d'))
+sboxes.ORTHROS = SBox(int(x, 16) for x in "1024386d9abefc75")
 
 # SBox.xddt = xddt
 # SBox.yddt = yddt
