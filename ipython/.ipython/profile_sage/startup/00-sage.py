@@ -77,6 +77,31 @@ def xyddt(sbox: SBox):
     setattr(sbox, '_xyddt', res)
     return res
 
+def affine_xyddt(sbox: SBox):
+    if (hasattr(sbox, '_affine_xyddt')):
+        return sbox._affine_xyddt
+
+    sbox_xyddt = xyddt(sbox)
+    input_bits = sbox.input_size()
+    output_bits = sbox.output_size()
+
+    result = np.full_like(sbox_xyddt, None, dtype=object)
+
+    variables = [f'x{i}' for i in range(input_bits)] + [f'y{i}' for i in range(output_bits)]
+
+    for i in range(1 << input_bits):
+        for j in range(1 << output_bits):
+            concat_set = {y << input_bits | x for x, y in sbox_xyddt[i, j]}
+            if not concat_set:
+                continue
+
+            offset, vec_space = affine_hull(concat_set, input_bits + output_bits)
+            result[i, j] = ', '.join(describe_affine_hull(offset, vec_space, variables))
+
+    setattr(sbox, '_affine_xyddt', result)
+    return result
+
+
 def differential_spectrum(sbox: SBox):
     ddt = np.array(sbox.difference_distribution_table())
     return  Counter(np.sort(ddt.ravel())[::-1])
@@ -98,7 +123,6 @@ def linear_hull(elements: set[int], bits: int) -> VectorSpace:
     base_space = VectorSpace(GF(2), bits)
     return base_space.subspace(vectors)
 
-
 def affine_hull(elements: set[int], bits: int) -> tuple[vector, VectorSpace]:
     iterator = iter(elements)
 
@@ -110,6 +134,26 @@ def affine_hull(elements: set[int], bits: int) -> tuple[vector, VectorSpace]:
 
     base_space = VectorSpace(GF(2), bits)
     return offset, base_space.subspace(vectors)
+
+def describe_affine_hull(offset: vector, subspace: VectorSpace, variables: list[str]|None = None) -> list[str]:
+    if variables is None:
+        variables = [f'x{i}' for i in range(len(offset))]
+
+    basis_matrix = subspace.basis_matrix()
+    right_kern = basis_matrix.right_kernel_matrix().T
+
+    assert np.all(basis_matrix * right_kern == 0)
+
+    A = right_kern.T
+    b = right_kern.T * offset
+
+    res: list[str] = []
+    for lhs, rhs in zip(A, b):
+        lhs_str = ' \u2295 '.join(v for c, v in zip(lhs, variables) if c)
+        res.append(f'{lhs_str} = {rhs}')
+
+    return res
+
 
 
 def affine_hull_list(elements: list[int], bits: int) -> list[int]:
