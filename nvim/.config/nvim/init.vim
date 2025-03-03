@@ -35,54 +35,55 @@ nnoremap <expr> gp '`[' . strpart(getregtype(), 0, 1) . '`]'
 
 " vim-plug
 call plug#begin('~/.local/share/nvim/plugged')
-Plug 'tpope/vim-sensible'
-Plug 'tpope/vim-repeat'
-Plug 'tpope/vim-surround'
-Plug 'tpope/vim-fugitive'
-Plug 'tpope/vim-rhubarb'
-Plug 'tpope/vim-speeddating'
-Plug 'tpope/vim-commentary'
-Plug 'shumphrey/fugitive-gitlab.vim'
-" Plug 'easymotion/vim-easymotion'
-Plug 'itchyny/lightline.vim'
-Plug 'farmergreg/vim-lastplace'
-" Plug 'SirVer/ultisnips'
-" Plug 'honza/vim-snippets'
-"Plug 'luochen1990/rainbow'
 Plug 'airblade/vim-gitgutter'
-" Plug 'scrooloose/nerdtree'
-Plug 'lervag/vimtex'
-Plug 'machakann/vim-highlightedyank'
-Plug 'tommcdo/vim-exchange'
-Plug 'nelstrom/vim-visual-star-search'
 Plug 'cespare/vim-toml'
-Plug 'thaerkh/vim-workspace'
+Plug 'ctrlpvim/ctrlp.vim'
+Plug 'derekwyatt/vim-fswitch'
+Plug 'fanosta/hotcrp.vim'
+Plug 'farmergreg/vim-lastplace'
+Plug 'gaving/vim-textobj-argument'
+Plug 'github/copilot.vim'
+Plug 'godlygeek/tabular'
+Plug 'itchyny/lightline.vim'
+Plug 'jiangmiao/auto-pairs'
 Plug 'junegunn/fzf'
 Plug 'junegunn/fzf.vim'
-Plug 'godlygeek/tabular'
-Plug 'fanosta/hotcrp.vim'
-Plug 'vale1410/vim-minizinc'
-" Plug 'madox2/vim-ai'
-"
-" Plug 'inkarkat/argtextobj.vim'
-Plug 'gaving/vim-textobj-argument'
-"
-" Plug 'Valloric/YouCompleteMe', { 'do': './install.py --clang-completer' }
-" Plug 'glacambre/firenvim', { 'do': { _ -> firenvim#install(0) } }
-Plug 'derekwyatt/vim-fswitch'
-" Plug 'agude/vim-eldar' "color scheme eldar
-Plug 'sonph/onehalf', {'rtp': 'vim/'}
-" Plug 'dense-analysis/ale'
-" Plug 'ms-jpq/coq_nvim', {'branch': 'coq'}
-" Plug 'ms-jpq/coq.artifacts', {'branch': 'artifacts'} " 9000+ Snippets
-" Plug 'ms-jpq/coq.thirdparty', {'branch': '3p'}
-" Plug 'neovim/nvim-lspconfig'
-Plug 'mechatroner/rainbow_csv'
-Plug 'ctrlpvim/ctrlp.vim'
-Plug 'jiangmiao/auto-pairs'
-Plug 'neovim/nvim-lspconfig'
-Plug 'github/copilot.vim'
+Plug 'kaarmu/typst.vim'
 Plug 'kyoh86/vim-jsonl'
+Plug 'machakann/vim-highlightedyank'
+Plug 'mechatroner/rainbow_csv'
+Plug 'nelstrom/vim-visual-star-search'
+Plug 'neovim/nvim-lspconfig'
+Plug 'shumphrey/fugitive-gitlab.vim'
+Plug 'sonph/onehalf', {'rtp': 'vim/'}
+Plug 'thaerkh/vim-workspace'
+Plug 'tommcdo/vim-exchange'
+Plug 'tpope/vim-commentary'
+Plug 'tpope/vim-fugitive'
+Plug 'tpope/vim-repeat'
+Plug 'tpope/vim-rhubarb'
+Plug 'tpope/vim-sensible'
+Plug 'tpope/vim-speeddating'
+Plug 'tpope/vim-surround'
+Plug 'vale1410/vim-minizinc'
+"" Plug 'lervag/vimtex' " causes performance degradation
+"" Plug 'easymotion/vim-easymotion'
+"" Plug 'SirVer/ultisnips'
+"" Plug 'honza/vim-snippets'
+""Plug 'luochen1990/rainbow'
+"" Plug 'scrooloose/nerdtree'
+"" Plug 'madox2/vim-ai'
+""
+"" Plug 'inkarkat/argtextobj.vim'
+""
+"" Plug 'Valloric/YouCompleteMe', { 'do': './install.py --clang-completer' }
+"" Plug 'glacambre/firenvim', { 'do': { _ -> firenvim#install(0) } }
+"" Plug 'agude/vim-eldar' "color scheme eldar
+"" Plug 'dense-analysis/ale'
+"" Plug 'ms-jpq/coq_nvim', {'branch': 'coq'}
+"" Plug 'ms-jpq/coq.artifacts', {'branch': 'artifacts'} " 9000+ Snippets
+"" Plug 'ms-jpq/coq.thirdparty', {'branch': '3p'}
+"" Plug 'neovim/nvim-lspconfig'
 call plug#end()
 
 " copilot setup
@@ -103,6 +104,20 @@ lua require'lspconfig'.pyright.setup{}
 
 " lsp.<server>.setup(<stuff...>)                              -- before
 " lsp.<server>.setup(coq.lsp_ensure_capabilities(<stuff...>)) -- after
+
+lua << EOF
+
+-- You will likely want to reduce updatetime which affects CursorHold
+-- note: this setting is global and should be set only once
+-- vim.o.updatetime = 250
+vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
+  group = vim.api.nvim_create_augroup("float_diagnostic", { clear = true }),
+  callback = function ()
+    vim.diagnostic.open_float(nil, {focus=false})
+  end
+})
+
+EOF
 
 " SpeedDating
 augroup dateformats
@@ -140,8 +155,8 @@ endfunction
 let g:lightline = {
       \ 'colorscheme': 'onehalfdark',
       \ 'active': {
-      \   'left': [ [ 'mode', 'paste' ],
-      \             [ 'gitbranch', 'readonly', 'filename', 'modified' ] ]
+      \   'left': [ [ 'mode', 'paste', ],
+      \             [ 'gitbranch', 'readonly', 'word_count', 'filename', 'modified' ] ]
       \ },
       \ 'component_function': {
       \   'gitbranch': 'FugitiveHead'
