@@ -173,11 +173,11 @@ def is_planar(sbox: SBox) -> bool:
         return sbox._planar
 
     if sbox.differential_uniformity() <= 4:
-        setattr(sbox, '_planar', False)
+        setattr(sbox, '_planar', True)
         return True
 
     if sbox.max_degree() <= 2 and sbox.inverse().max_degree() <= 2:
-        setattr(sbox, '_planar', False)
+        setattr(sbox, '_planar', True)
         return True
 
     # ddt entries must be 0 or power of 2
@@ -205,7 +205,7 @@ def is_planar(sbox: SBox) -> bool:
     setattr(sbox, '_planar', True)
     return True
 
-def undisturbed_bits(s):
+def undisturbed_bits(s: SBox):
     in_bits = s.input_size()
     out_bits = s.output_size()
 
