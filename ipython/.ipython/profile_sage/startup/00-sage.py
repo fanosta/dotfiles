@@ -266,6 +266,34 @@ sboxes.RoadRunneR = SBox(int(x, 16) for x in "086d5f7c4e2391ba")
 sboxes.Ascon_le = sboxes.SBox(bytearray.fromhex('040f1b010b00170d1f1c021012110c1e1a1914061516180a050e09130803071d'))
 sboxes.ORTHROS = SBox(int(x, 16) for x in "1024386d9abefc75")
 
+_m0 = matrix.identity(GF(2), 4)
+_m1 = matrix.identity(GF(2), 4)
+_m2 = matrix.identity(GF(2), 4)
+_m3 = matrix.identity(GF(2), 4)
+_m0[0, 0] = 0
+_m1[1, 1] = 0
+_m2[2, 2] = 0
+_m3[3, 3] = 0
+
+prince_m0 = matrix.block(
+    [
+        [_m0, _m1, _m2, _m3],
+        [_m1, _m2, _m3, _m0],
+        [_m2, _m3, _m0, _m1],
+        [_m3, _m0, _m1, _m2],
+    ]
+)
+prince_m1 = matrix.block(
+    [
+        [_m1, _m2, _m3, _m0],
+        [_m2, _m3, _m0, _m1],
+        [_m3, _m0, _m1, _m2],
+        [_m0, _m1, _m2, _m3],
+    ]
+)
+prince_big_matrix = matrix.block_diagonal(prince_m0, prince_m1, prince_m1, prince_m0)
+
+
 # SBox.xddt = xddt
 # SBox.yddt = yddt
 
