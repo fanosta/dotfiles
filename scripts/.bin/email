@@ -11,8 +11,9 @@ import io
 import subprocess as sp
 from pathlib import Path
 import sys
+from contextlib import chdir
 
-from typing import Literal
+from typing import Literal, Iterable
 
 
 def parse_headers(file: io.TextIOBase):
@@ -115,6 +116,13 @@ def send_email_mailapp(file: io.TextIOBase):
             end tell
         end tell
     '''
+    return applescript
+
+def send_emails_mailapp(files: Iterable[io.TextIOBase]):
+    applescript = ''
+    for file in files:
+        applescript += send_email_mailapp(file)
+
     sp.run(['osascript', '-e', applescript], capture_output=True)
 
 
@@ -147,18 +155,19 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("file", type=argparse.FileType('r'), nargs='+', help='.eml file for sending')
     args = parser.parse_args()
-    files = args.file
+    # files = args.file
 
-    for file in files:
-        cwd = os.getcwd()
-        dirname = os.path.dirname(file.name)
-        if not dirname.startswith('/'):
-            dirname = './' + dirname
-        os.chdir(dirname)
+    def iterate_files():
+        for file in args.file:
+            dirname = os.path.dirname(file.name)
+            if not dirname.startswith('/'):
+                dirname = './' + dirname
 
-        if sys.platform == 'darwin':
-            send_email_mailapp(file)
-        else:
+            with chdir(dirname):
+                yield file
+
+    if sys.platform == 'darwin':
+        send_emails_mailapp(iterate_files())
+    else:
+        for file in iterate_files():
             send_email_thunderbird(file)
-
-        os.chdir(cwd)

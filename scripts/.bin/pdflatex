@@ -12,7 +12,7 @@ fi
 tmpdir=$(mktemp -d)
 trap "rm -rf $tmpdir" EXIT
 
-pdflatex -output-directory "$tmpdir" "$@"
+pdflatex -output-directory "$tmpdir" "$@" </dev/null
 ret=$?
 
 cp -rf "$tmpdir/"* .

@@ -96,7 +96,7 @@ def main(input_file: Path, pages: str, margin: str, bound_box_vals: tuple[int, i
                        "-m", margin,
                        "-c" if clip else "-nc",
                        "--bb", bounding_box,
-                       "--nobb", no_bounding_box,
+                       # "--nobb", no_bounding_box,
                        input_file]
 
         try:

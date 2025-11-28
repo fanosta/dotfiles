@@ -1,3 +1,2 @@
 #!/bin/bash
-nohup nautilus $1 >&/dev/null &
-disown %nohup
+exec open "$@"

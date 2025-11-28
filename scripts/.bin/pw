@@ -1,3 +1,41 @@
-#!/bin/bash
-cat /dev/urandom | LC_ALL=C tr -dc '0-9A-Za-z' | head -c ${1:-16};
-echo
+#!/usr/bin/env python3
+import argparse
+import math
+import secrets
+import string
+import sys
+
+alphabets = {
+    'hex': string.hexdigits.lower()[:16],  # 0-9, a-f
+    'alphanumeric': string.ascii_letters + string.digits,
+    'printable': string.ascii_letters + string.digits + string.punctuation,
+    'lowercase': string.ascii_lowercase,
+    'lowercasenum': string.ascii_lowercase + string.digits,
+    'nice': '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz',
+}
+
+def main():
+    parser = argparse.ArgumentParser(description="Generate a secure password.")
+    parser.add_argument("bits", nargs="?", type=int, default=128, help="Security strength in bits.")
+    parser.add_argument("-a", "--alphabet", choices=alphabets.keys(), default="nice", help="Alphabet type.")
+    parser.add_argument("-n", "--no-newline", action="store_true", help="Do not append a newline at the end of the password.")
+    args = parser.parse_args()
+
+    bits = args.bits
+    if bits < 40:
+        print("password strength should be at least 40 bits", file=sys.stderr)
+        sys.exit(1)
+
+
+    alphabet = alphabets[args.alphabet]
+    length = math.ceil(bits / math.log2(len(alphabet)))
+    password = ''.join(secrets.choice(alphabet) for _ in range(length))
+
+    estimated_strength = len(password) * math.log2(len(alphabet))
+    assert len(set(alphabet)) == len(alphabet), "Alphabet contains non-unique characters."
+    assert estimated_strength >= args.bits, "Generated password does not meet the required strength."
+
+    print(password, end='' if args.no_newline else '\n')
+
+if __name__ == "__main__":
+    main()
