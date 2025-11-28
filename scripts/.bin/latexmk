@@ -1,0 +1,306 @@
+#!/usr/bin/env python3
+from __future__ import annotations
+
+import os
+import io
+import sys
+import subprocess as sp
+import  fcntl
+
+from pathlib import Path
+from contextlib import contextmanager, AbstractContextManager
+from tempfile import gettempdir
+from typing import Literal
+
+
+GLOBS = """\
+*.aux
+*.lof
+*.log
+*.lot
+*.fls
+*.out
+*.toc
+*.fmt
+*.fot
+*.cb
+*.cb2
+.*.lb
+*.dvi
+*.xdv
+*-converted-to.*
+.pdf
+*.bbl
+*.bbl-SAVE-ERROR
+*.bcf
+*.bcf-SAVE-ERROR
+*.blg
+*-blx.aux
+*-blx.bib
+*.run.xml
+*.fdb_latexmk
+*.synctex
+*.synctex(busy)
+*.synctex.gz
+*.synctex.gz(busy)
+*.pdfsync
+*.rubbercache
+rubber.cache
+latex.out/
+*.alg
+*.loa
+acs-*.bib
+*.thm
+*.atfi
+*.nav
+*.pre
+*.snm
+*.vrb
+*.soc
+*.loc
+*.cut
+*.cpt
+*.spl
+*.ent
+*.lox
+*.mf
+*.mp
+*.t[1-9]
+*.t[1-9][0-9]
+*.tfm
+*.end
+*.?end
+*.[1-9]
+*.[1-9][0-9]
+*.[1-9][0-9][0-9]
+*.[1-9]R
+*.[1-9][0-9]R
+*.[1-9][0-9][0-9]R
+*.eledsec[1-9]
+*.eledsec[1-9]R
+*.eledsec[1-9][0-9]
+*.eledsec[1-9][0-9]R
+*.eledsec[1-9][0-9][0-9]
+*.eledsec[1-9][0-9][0-9]R
+*.acn
+*.acr
+*.glg
+*.glg-abr
+*.glo
+*.glo-abr
+*.gls
+*.gls-abr
+*.glsdefs
+*.lzo
+*.lzs
+*.slg
+*.slo
+*.sls
+*.table
+*-gnuplottex-*
+*.gnuplot
+*.gaux
+*.glog
+*.gtex
+*.4ct
+*.4tc
+*.idv
+*.lg
+*.trc
+*.xref
+*.hd
+*.brf
+*-concordance.tex
+*-tikzDictionary
+*.lol
+*.ltjruby
+*.idx
+*.ilg
+*.ind
+*.maf
+*.mlf
+*.mlt
+*.mtc[0-9]*
+*.slf[0-9]*
+*.slt[0-9]*
+*.stc[0-9]*
+_minted*
+*.data.minted
+*.pyg
+*.mw
+*.newpax
+*.nlg
+*.nlo
+*.nls
+*.pax
+*.pdfpc
+*.sagetex.sage
+*.sagetex.py
+*.sagetex.scmd
+# scrwfile
+*.wrt
+*.spell.bad
+*.spell.txt
+svg-inkscape/
+*.sout
+*.sympy
+sympy-plots-for-*.tex/
+*.upa
+*.upb
+*.pytxcode
+pythontex-files-*/
+*.listing
+*.loe
+*.dpth
+*.md5
+*.auxlock
+*.ptc
+*.tdo
+*.hst
+*.ver
+*.lod
+*.xcp
+*.xmpi
+*.xdy
+*.xyc
+*.xyd
+*.ttt
+*.fff
+TSWLatexianTemp*
+*.bak
+*.sav
+*.bak[0-9]*
+.texpadtmp
+*.lyx~
+*.backup
+.*.swp
+*~[0-9]*
+*.tps
+./auto/*
+*.el
+*-tags.tex
+*.sta
+*.lpz
+*.xwm
+""".split("\n")
+
+
+
+def find_original_executable(cmd: str) -> str:
+    path = os.environ['PATH'].split(':')
+    file_dir = Path(__file__).parent
+
+    path = [p for p in path if Path(p) != file_dir]
+    new_path = ":".join(path)
+
+    executable = sp.check_output(('which', 'latexmk'), env={'PATH': new_path}, text=True).strip()
+    return executable
+
+
+def get_cache_key_and_dir() -> tuple[str, Path]|None:
+    home = Path.expanduser(Path("~"))
+    xdg_cache_home = Path(os.getenv('XDG_CACHE_HOME', home / '.cache'))
+
+    try:
+        current_path = Path('.').resolve().relative_to(home)
+    except ValueError:
+        return None
+
+    encoded_path = str(current_path).replace('-', '--').replace('/', '-')
+
+    cache_dir = xdg_cache_home / 'latex' / encoded_path
+    cache_dir.mkdir(exist_ok=True, parents=True)
+    return encoded_path, cache_dir
+
+
+@contextmanager
+def _null_context_manager():
+    yield
+
+def build_cache_manager() -> AbstractContextManager:
+    cache_spec = get_cache_key_and_dir()
+    if cache_spec is None:
+        return _null_context_manager()
+
+    cache_key, cache_dir = cache_spec
+    work_dir = Path(".").resolve()
+    return _CacheLoader(cache_key, cache_dir, work_dir)
+
+
+class _CacheLoader(AbstractContextManager):
+    def __init__(self, cache_key: str, cache_dir: Path, work_dir: Path):
+        self.cache_key = cache_key
+        self.cache_dir = cache_dir
+        self.work_dir = work_dir
+
+    def _read_cache(self):
+        # print(f"loading LaTeX files from {self.cache_dir}")
+        for file in self.cache_dir.iterdir():
+            file.rename(self.work_dir / file.name)
+
+    def _write_cache(self):
+        # print(f"writing LaTeX files to {self.cache_dir}")
+        for glob in GLOBS:
+            try:
+                matches = self.work_dir.glob(glob)
+            except ValueError:
+                continue
+            for file in matches:
+                file.rename(self.cache_dir / file.name)
+
+    @contextmanager
+    def lock_refcount_file(self):
+        refcount_file = Path(gettempdir()) / f"latexmk-wrapper-{self.cache_key}-refcount"
+        refcount_file.touch()
+        with open(refcount_file, 'r+') as f:
+            fcntl.flock(f, fcntl.LOCK_EX)
+            try:
+                f.seek(0)
+                yield f
+            finally:
+                fcntl.flock(f, fcntl.LOCK_UN)
+
+    @contextmanager
+    def add_to_refcount(self, incr: Literal[-1, 1]):
+        minimum_refcount = 0 if incr > 0 else 1
+        with self.lock_refcount_file() as f:
+            f.seek(0, io.SEEK_SET)
+            content = f.read()
+            try:
+                old_refcount = int(content)
+            except ValueError:
+                if not (content == '' and incr == 1):
+                    print(f"ERROR: expected integer refcount, got {content!r}", file=sys.stderr)
+                    print(f"ERROR: assuming {minimum_refcount}", file=sys.stderr)
+                old_refcount = minimum_refcount
+            if old_refcount < minimum_refcount:
+                print(f"ERROR: refcount >= {minimum_refcount}, got {old_refcount}", file=sys.stderr)
+                print(f"ERROR: assuming {minimum_refcount}", file=sys.stderr)
+                old_refcount = minimum_refcount
+
+            f.seek(0, io.SEEK_SET)
+            f.write(f"{old_refcount + incr}")
+            yield old_refcount
+
+    def __enter__(self):
+        with self.add_to_refcount(+1) as old_refcount:
+            if old_refcount == 0:
+                self._read_cache()
+
+    def __exit__(self, exception_type, exception_value, tb):
+        with self.add_to_refcount(-1) as old_refcount:
+            if old_refcount == 1:
+                self._write_cache()
+
+
+def main():
+    exe = find_original_executable(sys.argv[0])
+
+    with build_cache_manager():
+        res = sp.call(sys.argv, executable=exe)
+
+    return res
+
+
+if __name__ == '__main__':
+    raise SystemExit(main())
