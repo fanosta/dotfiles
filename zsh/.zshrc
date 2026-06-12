@@ -92,8 +92,8 @@ bindkey "\e[A" up-line-or-beginning-search # Up
 bindkey "\e[B" down-line-or-beginning-search # Down
 
 # jump words with ctrl-left/right
-bindkey "$terminfo[kLFT5]" backward-word # CTRL-Left
-bindkey "$terminfo[kRIT5]" forward-word # CTRL-Right
+# bindkey "$terminfo[kLFT5]" backward-word # CTRL-Left
+# bindkey "$terminfo[kRIT5]" forward-word # CTRL-Right
 
 
 source "${ZDOTDIR:-$HOME}/.aliases.zsh"

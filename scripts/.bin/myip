@@ -1,21 +1,161 @@
-#!/bin/bash
-sleep 1000 &
-sleep_pid=$!
+#!/usr/bin/env python3
+import argparse
+import concurrent.futures
+import subprocess
+import sys
+import time
+from typing import Optional
 
-tmpfile=$(mktemp)
-trap "rm $tmpfile" EXIT
+CMDS: dict[str, tuple[list[str], list[str]]] = {
+    "4": (
+        ["dig", "+short", "+time=3", "+tries=1", "@resolver1.opendns.com", "myip.opendns.com"],
+        ["curl", "-s", "--max-time", "3", "-4", "https://api.ipify.org/"],
+    ),
+    "6": (
+        ["dig", "+short", "+time=3", "+tries=1", "AAAA", "@2620:119:35::35", "myip.opendns.com"],
+        ["curl", "-s", "--max-time", "3", "-6", "https://api6.ipify.org/"],
+    ),
+}
 
-{
-  dig +short @resolver1.opendns.com myip.opendns.com > "$tmpfile";
-  kill $sleep_pid 2>/dev/null;
-} &
-dig_pid=$!
-{
-  curl -s https://api.ipify.org/ > "$tmpfile"
-  kill $sleep_pid 2>/dev/null;
-} &
-curl_pid=$!
-wait $sleep_pid
-kill $dig_pid $sleep_pid 2>/dev/null
-cat $tmpfile | tr -d '\n'
-echo
+_debug = False
+_start = time.monotonic()
+_GREY = "\033[2m"
+_RESET = "\033[0m"
+
+
+def grey(text: str, stream: "sys.IO[str]" = sys.stderr) -> str:  # type: ignore[name-defined]
+    try:
+        is_tty = stream.isatty()
+    except Exception:
+        is_tty = False
+    return f"{_GREY}{text}{_RESET}" if is_tty else text
+
+
+def dbg(msg: str) -> None:
+    if _debug:
+        ms = (time.monotonic() - _start) * 1000
+        print(grey(f"[{ms:6.1f}ms] {msg}"), file=sys.stderr)
+
+
+def launch(version: str) -> list[tuple[
+    subprocess.Popen[str],
+    concurrent.futures.Future[tuple[str, str, float]],
+]]:
+    pairs: list[tuple[subprocess.Popen[str], concurrent.futures.Future[tuple[str, str, float]]]] = []
+    executor = concurrent.futures.ThreadPoolExecutor(max_workers=2)
+    for label, cmd in zip(("dns", "http"), CMDS[version]):
+        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True)
+        dbg(f"launched  ipv{version}/{label}  pid={proc.pid}  cmd={' '.join(cmd)}")
+        start = time.monotonic()
+
+        def collect(p: subprocess.Popen[str] = proc, lbl: str = label, v: str = version, t: float = start) -> tuple[str, str, float]:
+            out, _ = p.communicate()
+            elapsed = time.monotonic() - t
+            if p.returncode != 0:
+                dbg(f"failed    ipv{v}/{lbl}  pid={p.pid}  rc={p.returncode}")
+                raise RuntimeError(f"{lbl} exited with code {p.returncode}")
+            ip = out.strip()
+            if not ip or ip.startswith(";"):
+                dbg(f"failed    ipv{v}/{lbl}  pid={p.pid}  no valid output")
+                raise RuntimeError(f"{lbl} returned no valid output")
+            dbg(f"completed ipv{v}/{lbl}  pid={p.pid}  ip={ip}")
+            return ip, lbl, elapsed
+
+        pairs.append((proc, executor.submit(collect)))
+    executor.shutdown(wait=False)
+    return pairs
+
+
+def is_available(version: str) -> bool:
+    import socket
+    family, addr = (socket.AF_INET, "0.0.0.0") if version == "4" else (socket.AF_INET6, "::")
+    try:
+        with socket.socket(family, socket.SOCK_DGRAM) as s:
+            s.connect(("8.8.8.8" if version == "4" else "2001:4860:4860::8888", 53))
+        return True
+    except OSError:
+        return False
+
+
+def kill_all(procs: list[subprocess.Popen[str]], version: str) -> None:
+    for p in procs:
+        if p.returncode is None:
+            dbg(f"killed    ipv{version}  pid={p.pid}")
+            p.kill()
+
+
+def main() -> None:
+    global _debug
+    parser = argparse.ArgumentParser(description="Print public IP address")
+    parser.add_argument("-v", "--verbose", action="store_true", help="show method and timing")
+    parser.add_argument("-d", "--debug", action="store_true", help="show process lifecycle on stderr")
+    parser.add_argument("-4", dest="versions", action="append_const", const="4", help="IPv4 (default)")
+    parser.add_argument("-6", dest="versions", action="append_const", const="6", help="IPv6")
+    args = parser.parse_args()
+    _debug = args.debug
+
+    if args.versions:
+        seen: set[str] = set()
+        versions = [v for v in args.versions if not (v in seen or seen.add(v))]  # type: ignore[func-returns-value]
+    else:
+        versions = ["4", "6"]
+
+    future_to_v: dict[concurrent.futures.Future[tuple[str, str, float]], str] = {}
+    version_procs: dict[str, list[subprocess.Popen[str]]] = {}
+    for v in versions:
+        if not is_available(v):
+            dbg(f"skipping  ipv{v}  (no local interface)")
+            continue
+        version_procs[v] = []
+        for proc, f in launch(v):
+            future_to_v[f] = v
+            version_procs[v].append(proc)
+
+    results: dict[str, Optional[tuple[str, str, float]]] = {}
+    got_success = False
+
+    pending = set(future_to_v)
+    while pending:
+        timeout = 0.5 if got_success else 5.0
+        done, pending = concurrent.futures.wait(
+            pending, timeout=timeout,
+            return_when=concurrent.futures.FIRST_COMPLETED,
+        )
+        if not done:
+            dbg(f"timed out waiting for remaining futures ({timeout:.1f}s grace)")
+            break
+        for f in done:
+            v = future_to_v[f]
+            if v in results:
+                continue
+            try:
+                results[v] = f.result()
+                got_success = True
+                kill_all(version_procs[v], v)
+            except Exception:
+                pass
+
+    for v, procs in version_procs.items():
+        kill_all(procs, v)
+
+    any_ok = False
+    for v in versions:
+        result = results.get(v)
+        if result is None:
+            if args.verbose or args.debug:
+                print(grey(f"IPv{v}: unavailable"), file=sys.stderr)
+            continue
+        any_ok = True
+        ip, label, elapsed = result
+        if args.verbose:
+            suffix = grey(f"  (via {label}, {elapsed*1000:.0f}ms)", sys.stdout)
+            print(f"{ip}{suffix}")
+        else:
+            print(ip)
+
+    if not any_ok:
+        raise SystemExit("error: all methods failed")
+
+
+if __name__ == "__main__":
+    main()

@@ -13,176 +13,176 @@ from tempfile import gettempdir
 from typing import Literal
 
 
-GLOBS = """\
-*.aux
-*.lof
-*.log
-*.lot
-*.fls
-*.out
-*.toc
-*.fmt
-*.fot
-*.cb
-*.cb2
-.*.lb
-*.dvi
-*.xdv
-*-converted-to.*
-.pdf
-*.bbl
-*.bbl-SAVE-ERROR
-*.bcf
-*.bcf-SAVE-ERROR
-*.blg
-*-blx.aux
-*-blx.bib
-*.run.xml
-*.fdb_latexmk
-*.synctex
-*.synctex(busy)
-*.synctex.gz
-*.synctex.gz(busy)
-*.pdfsync
-*.rubbercache
-rubber.cache
-latex.out/
-*.alg
-*.loa
-acs-*.bib
-*.thm
-*.atfi
-*.nav
-*.pre
-*.snm
-*.vrb
-*.soc
-*.loc
-*.cut
-*.cpt
-*.spl
-*.ent
-*.lox
-*.mf
-*.mp
-*.t[1-9]
-*.t[1-9][0-9]
-*.tfm
-*.end
-*.?end
-*.[1-9]
-*.[1-9][0-9]
-*.[1-9][0-9][0-9]
-*.[1-9]R
-*.[1-9][0-9]R
-*.[1-9][0-9][0-9]R
-*.eledsec[1-9]
-*.eledsec[1-9]R
-*.eledsec[1-9][0-9]
-*.eledsec[1-9][0-9]R
-*.eledsec[1-9][0-9][0-9]
-*.eledsec[1-9][0-9][0-9]R
-*.acn
-*.acr
-*.glg
-*.glg-abr
-*.glo
-*.glo-abr
-*.gls
-*.gls-abr
-*.glsdefs
-*.lzo
-*.lzs
-*.slg
-*.slo
-*.sls
-*.table
-*-gnuplottex-*
-*.gnuplot
-*.gaux
-*.glog
-*.gtex
-*.4ct
-*.4tc
-*.idv
-*.lg
-*.trc
-*.xref
-*.hd
-*.brf
-*-concordance.tex
-*-tikzDictionary
-*.lol
-*.ltjruby
-*.idx
-*.ilg
-*.ind
-*.maf
-*.mlf
-*.mlt
-*.mtc[0-9]*
-*.slf[0-9]*
-*.slt[0-9]*
-*.stc[0-9]*
-_minted*
-*.data.minted
-*.pyg
-*.mw
-*.newpax
-*.nlg
-*.nlo
-*.nls
-*.pax
-*.pdfpc
-*.sagetex.sage
-*.sagetex.py
-*.sagetex.scmd
-# scrwfile
-*.wrt
-*.spell.bad
-*.spell.txt
-svg-inkscape/
-*.sout
-*.sympy
-sympy-plots-for-*.tex/
-*.upa
-*.upb
-*.pytxcode
-pythontex-files-*/
-*.listing
-*.loe
-*.dpth
-*.md5
-*.auxlock
-*.ptc
-*.tdo
-*.hst
-*.ver
-*.lod
-*.xcp
-*.xmpi
-*.xdy
-*.xyc
-*.xyd
-*.ttt
-*.fff
-TSWLatexianTemp*
-*.bak
-*.sav
-*.bak[0-9]*
-.texpadtmp
-*.lyx~
-*.backup
-.*.swp
-*~[0-9]*
-*.tps
-./auto/*
-*.el
-*-tags.tex
-*.sta
-*.lpz
-*.xwm
-""".split("\n")
+GLOBS = (
+    "*.aux",
+    "*.lof",
+    # "*.log",
+    "*.lot",
+    "*.fls",
+    "*.out",
+    "*.toc",
+    "*.fmt",
+    "*.fot",
+    "*.cb",
+    "*.cb2",
+    ".*.lb",
+    "*.dvi",
+    "*.xdv",
+    "*-converted-to.*",
+    ".pdf",
+    "*.bbl",
+    "*.bbl-SAVE-ERROR",
+    "*.bcf",
+    "*.bcf-SAVE-ERROR",
+    "*.blg",
+    "*-blx.aux",
+    "*-blx.bib",
+    "*.run.xml",
+    "*.fdb_latexmk",
+    # "*.synctex",
+    "*.synctex(busy)",
+    # "*.synctex.gz",
+    "*.synctex.gz(busy)",
+    "*.pdfsync",
+    "*.rubbercache",
+    "rubber.cache",
+    "latex.out/",
+    "*.alg",
+    "*.loa",
+    "acs-*.bib",
+    "*.thm",
+    "*.atfi",
+    "*.nav",
+    "*.pre",
+    "*.snm",
+    "*.vrb",
+    "*.soc",
+    "*.loc",
+    "*.cut",
+    "*.cpt",
+    "*.spl",
+    "*.ent",
+    "*.lox",
+    "*.mf",
+    "*.mp",
+    "*.t[1-9]",
+    "*.t[1-9][0-9]",
+    "*.tfm",
+    "*.end",
+    "*.?end",
+    "*.[1-9]",
+    "*.[1-9][0-9]",
+    "*.[1-9][0-9][0-9]",
+    "*.[1-9]R",
+    "*.[1-9][0-9]R",
+    "*.[1-9][0-9][0-9]R",
+    "*.eledsec[1-9]",
+    "*.eledsec[1-9]R",
+    "*.eledsec[1-9][0-9]",
+    "*.eledsec[1-9][0-9]R",
+    "*.eledsec[1-9][0-9][0-9]",
+    "*.eledsec[1-9][0-9][0-9]R",
+    "*.acn",
+    "*.acr",
+    "*.glg",
+    "*.glg-abr",
+    "*.glo",
+    "*.glo-abr",
+    "*.gls",
+    "*.gls-abr",
+    "*.glsdefs",
+    "*.lzo",
+    "*.lzs",
+    "*.slg",
+    "*.slo",
+    "*.sls",
+    "*.table",
+    "*-gnuplottex-*",
+    "*.gnuplot",
+    "*.gaux",
+    "*.glog",
+    "*.gtex",
+    "*.4ct",
+    "*.4tc",
+    "*.idv",
+    "*.lg",
+    "*.trc",
+    "*.xref",
+    "*.hd",
+    "*.brf",
+    "*-concordance.tex",
+    "*-tikzDictionary",
+    "*.lol",
+    "*.ltjruby",
+    "*.idx",
+    "*.ilg",
+    "*.ind",
+    "*.maf",
+    "*.mlf",
+    "*.mlt",
+    "*.mtc[0-9]*",
+    "*.slf[0-9]*",
+    "*.slt[0-9]*",
+    "*.stc[0-9]*",
+    "_minted*",
+    "*.data.minted",
+    "*.pyg",
+    "*.mw",
+    "*.newpax",
+    "*.nlg",
+    "*.nlo",
+    "*.nls",
+    "*.pax",
+    "*.pdfpc",
+    "*.sagetex.sage",
+    "*.sagetex.py",
+    "*.sagetex.scmd",
+    "# scrwfile",
+    "*.wrt",
+    "*.spell.bad",
+    "*.spell.txt",
+    "svg-inkscape/",
+    "*.sout",
+    "*.sympy",
+    "sympy-plots-for-*.tex/",
+    "*.upa",
+    "*.upb",
+    "*.pytxcode",
+    "pythontex-files-*/",
+    "*.listing",
+    "*.loe",
+    "*.dpth",
+    "*.md5",
+    "*.auxlock",
+    "*.ptc",
+    "*.tdo",
+    "*.hst",
+    "*.ver",
+    "*.lod",
+    "*.xcp",
+    "*.xmpi",
+    "*.xdy",
+    "*.xyc",
+    "*.xyd",
+    "*.ttt",
+    "*.fff",
+    "TSWLatexianTemp*",
+    "*.bak",
+    "*.sav",
+    "*.bak[0-9]*",
+    ".texpadtmp",
+    "*.lyx~",
+    "*.backup",
+    ".*.swp",
+    "*~[0-9]*",
+    "*.tps",
+    "./auto/*",
+    "*.el",
+    "*-tags.tex",
+    "*.sta",
+    "*.lpz",
+    "*.xwm",
+)
 
 
 
@@ -297,7 +297,7 @@ def main():
     exe = find_original_executable(sys.argv[0])
 
     with build_cache_manager():
-        res = sp.call(sys.argv, executable=exe)
+        res = sp.call(sys.argv, executable=exe, stdin=sp.DEVNULL)
 
     return res
 

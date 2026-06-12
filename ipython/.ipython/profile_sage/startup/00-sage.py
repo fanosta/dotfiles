@@ -104,7 +104,8 @@ def affine_xyddt(sbox: SBox):
 
 def differential_spectrum(sbox: SBox):
     ddt = np.array(sbox.difference_distribution_table())
-    return  Counter(np.sort(ddt.ravel())[::-1])
+    counter = Counter(np.sort(ddt.ravel())[::-1])
+    return {int(k): counter[k] for k in sorted(counter)}
 
 def _as_vec_gf2(x: int, bits: int) -> vector:
     v = vector(GF(2), bits)
@@ -253,6 +254,18 @@ def render_bitmap_log(bitmap: np.ndarray, factor: float):
     return img
 
 
+def _sbi_const_sb(sbox: SBox, constant: int) -> SBox:
+    if sbox.input_size() != sbox.output_size():
+        raise ValueError()
+
+    length = 2**sbox.input_size()
+    sbi = sbox.inverse()
+    new_sb = [sbox[sbi[i] ^ constant] for i in range(length)]
+    # new_sb = [sbox[i ^ constant] ^ sbox[i] for i in range(l)]
+    return SBox(new_sb)
+
+
+sboxes.ARADI = SBox(int(x, 16) for x in "01234df68b5ec7a9")
 sboxes.DEFAULT = SBox(int(x, 16) for x in "037ed4a9cf18b265")
 sboxes.BAKSHEESH = SBox(int(x, 16) for x in "306DB58ECF924A71")
 sboxes.SPEEDY = SBox([8, 0, 9, 3, 56, 16, 41, 19, 12, 13, 4, 7, 48, 1, 32, 35,
@@ -265,6 +278,64 @@ sboxes.LED = SBox(int(x, 16) for x in "c56b90ad3ef84712")
 sboxes.RoadRunneR = SBox(int(x, 16) for x in "086d5f7c4e2391ba")
 sboxes.Ascon_le = sboxes.SBox(bytearray.fromhex('040f1b010b00170d1f1c021012110c1e1a1914061516180a050e09130803071d'))
 sboxes.ORTHROS = SBox(int(x, 16) for x in "1024386d9abefc75")
+sboxes.NXP = SBox(int(x, 16) for x in "042bac985fd3716e")
+
+sboxes.FORKSKINNY_8_00 = _sbi_const_sb(sboxes.SKINNY_8, 0x01)
+sboxes.FORKSKINNY_8_01 = _sbi_const_sb(sboxes.SKINNY_8, 0x02)
+sboxes.FORKSKINNY_8_02 = _sbi_const_sb(sboxes.SKINNY_8, 0x04)
+sboxes.FORKSKINNY_8_03 = _sbi_const_sb(sboxes.SKINNY_8, 0x08)
+
+sboxes.FORKSKINNY_8_10 = _sbi_const_sb(sboxes.SKINNY_8, 0x10)
+sboxes.FORKSKINNY_8_11 = _sbi_const_sb(sboxes.SKINNY_8, 0x20)
+sboxes.FORKSKINNY_8_12 = _sbi_const_sb(sboxes.SKINNY_8, 0x41)
+sboxes.FORKSKINNY_8_13 = _sbi_const_sb(sboxes.SKINNY_8, 0x82)
+
+sboxes.FORKSKINNY_8_20 = _sbi_const_sb(sboxes.SKINNY_8, 0x05)
+sboxes.FORKSKINNY_8_21 = _sbi_const_sb(sboxes.SKINNY_8, 0x0a)
+sboxes.FORKSKINNY_8_22 = _sbi_const_sb(sboxes.SKINNY_8, 0x14)
+sboxes.FORKSKINNY_8_23 = _sbi_const_sb(sboxes.SKINNY_8, 0x28)
+
+sboxes.FORKSKINNY_8_30 = _sbi_const_sb(sboxes.SKINNY_8, 0x51)
+sboxes.FORKSKINNY_8_31 = _sbi_const_sb(sboxes.SKINNY_8, 0xa2)
+sboxes.FORKSKINNY_8_32 = _sbi_const_sb(sboxes.SKINNY_8, 0x44)
+sboxes.FORKSKINNY_8_33 = _sbi_const_sb(sboxes.SKINNY_8, 0x88)
+
+sboxes.FORKSKINNY_8 = [
+    sboxes.FORKSKINNY_8_00, sboxes.FORKSKINNY_8_01, sboxes.FORKSKINNY_8_02, sboxes.FORKSKINNY_8_03,
+    sboxes.FORKSKINNY_8_10, sboxes.FORKSKINNY_8_11, sboxes.FORKSKINNY_8_12, sboxes.FORKSKINNY_8_13,
+    sboxes.FORKSKINNY_8_20, sboxes.FORKSKINNY_8_21, sboxes.FORKSKINNY_8_22, sboxes.FORKSKINNY_8_23,
+    sboxes.FORKSKINNY_8_30, sboxes.FORKSKINNY_8_31, sboxes.FORKSKINNY_8_32, sboxes.FORKSKINNY_8_33,
+]
+
+
+sboxes.FORKSKINNY_4_00 = _sbi_const_sb(sboxes.SKINNY_4, 0x1)
+sboxes.FORKSKINNY_4_01 = _sbi_const_sb(sboxes.SKINNY_4, 0x2)
+sboxes.FORKSKINNY_4_02 = _sbi_const_sb(sboxes.SKINNY_4, 0x4)
+sboxes.FORKSKINNY_4_03 = _sbi_const_sb(sboxes.SKINNY_4, 0x9)
+
+sboxes.FORKSKINNY_4_10 = _sbi_const_sb(sboxes.SKINNY_4, 0x3)
+sboxes.FORKSKINNY_4_11 = _sbi_const_sb(sboxes.SKINNY_4, 0x6)
+sboxes.FORKSKINNY_4_12 = _sbi_const_sb(sboxes.SKINNY_4, 0xd)
+sboxes.FORKSKINNY_4_13 = _sbi_const_sb(sboxes.SKINNY_4, 0xa)
+
+sboxes.FORKSKINNY_4_20 = _sbi_const_sb(sboxes.SKINNY_4, 0x5)
+sboxes.FORKSKINNY_4_21 = _sbi_const_sb(sboxes.SKINNY_4, 0xb)
+sboxes.FORKSKINNY_4_22 = _sbi_const_sb(sboxes.SKINNY_4, 0x7)
+sboxes.FORKSKINNY_4_23 = _sbi_const_sb(sboxes.SKINNY_4, 0xf)
+
+sboxes.FORKSKINNY_4_30 = _sbi_const_sb(sboxes.SKINNY_4, 0xe)
+sboxes.FORKSKINNY_4_31 = _sbi_const_sb(sboxes.SKINNY_4, 0xc)
+sboxes.FORKSKINNY_4_32 = _sbi_const_sb(sboxes.SKINNY_4, 0x8)
+sboxes.FORKSKINNY_4_33 = _sbi_const_sb(sboxes.SKINNY_4, 0x1)
+
+sboxes.FORKSKINNY_4 = [
+    sboxes.FORKSKINNY_4_00, sboxes.FORKSKINNY_4_01, sboxes.FORKSKINNY_4_02, sboxes.FORKSKINNY_4_03,
+    sboxes.FORKSKINNY_4_10, sboxes.FORKSKINNY_4_11, sboxes.FORKSKINNY_4_12, sboxes.FORKSKINNY_4_13,
+    sboxes.FORKSKINNY_4_20, sboxes.FORKSKINNY_4_21, sboxes.FORKSKINNY_4_22, sboxes.FORKSKINNY_4_23,
+    sboxes.FORKSKINNY_4_30, sboxes.FORKSKINNY_4_31, sboxes.FORKSKINNY_4_32, sboxes.FORKSKINNY_4_33,
+]
+
+
 
 _m0 = matrix.identity(GF(2), 4)
 _m1 = matrix.identity(GF(2), 4)
@@ -293,6 +364,28 @@ prince_m1 = matrix.block(
 )
 prince_big_matrix = matrix.block_diagonal(prince_m0, prince_m1, prince_m1, prince_m0)
 
+def qarma_m42():
+    rho_1 = matrix(GF(2), [
+        [0, 1, 0, 0],
+        [0, 0, 1, 0],
+        [0, 0, 0, 1],
+        [1, 0, 0, 0],
+    ])
+    rho_2 = matrix(GF(2), [
+        [0, 0, 1, 0],
+        [0, 0, 0, 1],
+        [1, 0, 0, 0],
+        [0, 1, 0, 0],
+    ])
+    z = matrix.zero(GF(2), 4, 4)
+
+    m42 = matrix.block([
+        [z, rho_1, rho_2, rho_1],
+        [rho_1, z, rho_1, rho_2],
+        [rho_2, rho_1, z, rho_1],
+        [rho_1, rho_2, rho_1, z],
+    ])
+    return m42
 
 # SBox.xddt = xddt
 # SBox.yddt = yddt
